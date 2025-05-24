@@ -1,0 +1,58 @@
+# Bytecode do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos temporários e de cache
+*.log
+*.tmp
+*.swp
+*.bak
+
+# Arquivos do Flask
+instance/
+.env
+.env.*
+
+# Banco de dados local (caso esteja usando SQLite por enquanto)
+*.sqlite3
+*.db
+
+# Diretórios comuns de build/static
+/static/*
+!/static/.gitkeep
+
+/uploads/
+media/
+
+# Arquivos de configuração do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDEs e editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node (caso use alguma lib JS no futuro)
+node_modules/
+
+# PDF.js build (caso tenha clonado ou buildado manualmente)
+pdfjs/build/
+pdfjs/web/
+
+# Arquivos de exportação de PDF.js
+*.pdf.worker.js
+
+# Cache de templates compilados (Jinja2)
+*.jinja2c
+
+# Coverage e testes
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/

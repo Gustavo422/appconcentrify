@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Concentrify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Concentrify Logo" class="navbar-logo">
+            <div class="navbar-menu">
+                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Bem-vindo, {{ session.get('email') }}</h1>
+            </div>
+            <div class="card-body">
+                <p>Você está logado no sistema Concentrify.</p>
+                <p>Este é o dashboard principal do sistema.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
