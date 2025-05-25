@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Concentrify</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
 </head>
 <body>
     <nav class="navbar">
@@ -12,6 +13,7 @@
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Concentrify Logo" class="navbar-logo">
             <div class="navbar-menu">
                 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('products.index') }}">Produtos</a>
                 {% if session.get('is_admin') %}
                 <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
                 {% endif %}
@@ -35,7 +37,40 @@
             </div>
             <div class="card-body">
                 <p>Você está logado no sistema Concentrify.</p>
-                <p>Este é o dashboard principal do sistema.</p>
+                
+                <h2 class="section-title">Produtos Principais</h2>
+                <div class="product-grid">
+                    {% for product in main_products %}
+                    <div class="product-card">
+                        <img src="{{ url_for('static', filename='uploads/products/' + product.cover_image) }}" alt="{{ product.title }}" class="product-image">
+                        <div class="product-content">
+                            <h3 class="product-title">{{ product.title }}</h3>
+                            <div class="product-action">
+                                <a href="{{ url_for('products.view_pdf', id=product.id) }}" class="btn">Visualizar</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p>Nenhum produto principal disponível.</p>
+                    {% endfor %}
+                </div>
+
+                <h2 class="section-title">Produtos Bônus</h2>
+                <div class="product-grid">
+                    {% for product in bonus_products %}
+                    <div class="product-card">
+                        <img src="{{ url_for('static', filename='uploads/products/' + product.cover_image) }}" alt="{{ product.title }}" class="product-image">
+                        <div class="product-content">
+                            <h3 class="product-title">{{ product.title }}</h3>
+                            <div class="product-action">
+                                <a href="{{ url_for('products.view_pdf', id=product.id) }}" class="btn">Visualizar</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p>Nenhum produto bônus disponível.</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

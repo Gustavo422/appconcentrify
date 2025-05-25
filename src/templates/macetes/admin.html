@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração de Macetes - Concentrify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+    <style>
+        /* Estilos específicos para administração de macetes */
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .admin-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .admin-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .admin-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .admin-tab.active {
+            color: #3f51b5;
+            border-bottom-color: #3f51b5;
+        }
+        
+        .admin-tab:hover:not(.active) {
+            color: #555;
+            border-bottom-color: #ddd;
+        }
+        
+        .admin-content {
+            padding: 20px 0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Formulário de adição */
+        .add-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-button {
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .form-button:hover {
+            background-color: #303f9f;
+        }
+        
+        /* Lista de macetes */
+        .macetes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        .macetes-table th, .macetes-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .macetes-table th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .macetes-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .action-button {
+            background: none;
+            border: none;
+            color: #3f51b5;
+            cursor: pointer;
+            padding: 5px;
+            margin-right: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .action-button:hover {
+            background-color: #e8eaf6;
+        }
+        
+        .action-button.delete {
+            color: #f44336;
+        }
+        
+        .action-button.delete:hover {
+            background-color: #ffebee;
+        }
+        
+        /* Editor JSON */
+        .json-editor {
+            width: 100%;
+            min-height: 500px;
+            font-family: monospace;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            line-height: 1.5;
+            tab-size: 2;
+        }
+        
+        .json-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        /* Mensagens de alerta */
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .alert-error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .macetes-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Concentrify Logo" class="navbar-logo">
+            <div class="navbar-menu">
+                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('products.index') }}">Produtos</a>
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="admin-container">
+            <div class="admin-header">
+                <div>
+                    <a href="{{ url_for('macetes.index') }}" class="macetes-back">← Voltar para Macetes</a>
+                    <h1 class="admin-title">Administração de Macetes</h1>
+                    <p class="admin-subtitle">Gerencie os macetes disponíveis no sistema</p>
+                </div>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="visual">Edição Visual</button>
+                <button class="admin-tab" data-tab="json">Edição JSON</button>
+                <button class="admin-tab" data-tab="lista">Lista de Macetes</button>
+            </div>
+            
+            <div class="admin-content">
+                <!-- Alerta para feedback -->
+                <div id="alert-success" class="alert alert-success"></div>
+                <div id="alert-error" class="alert alert-error"></div>
+                
+                <!-- Tab de Edição Visual -->
+                <div id="tab-visual" class="tab-content active">
+                    <div class="add-form">
+                        <h3>Adicionar Novo Macete</h3>
+                        <form id="add-macete-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Categoria:</label>
+                                    <select class="form-select" id="classe" name="classe" required>
+                                        <option value="">Selecione uma categoria</option>
+                                        {% for categoria in categorias %}
+                                            <option value="{{ categoria }}">{{ categoria }}</option>
+                                        {% endfor %}
+                                        <option value="nova">+ Nova Categoria</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="nova-categoria-group" style="display: none;">
+                                    <label class="form-label">Nova Categoria:</label>
+                                    <input type="text" class="form-input" id="nova-categoria" name="nova-categoria">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Nível:</label>
+                                    <select class="form-select" id="nivel" name="nivel" required>
+                                        <option value="">Selecione um nível</option>
+                                        {% for nivel in niveis %}
+                                            <option value="{{ nivel }}">{{ nivel }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Título do Macete:</label>
+                                    <input type="text" class="form-input" id="macete" name="macete" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Abreviação/Sigla:</label>
+                                    <input type="text" class="form-input" id="abreviacao" name="abreviacao" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Explicação:</label>
+                                <textarea class="form-textarea" id="explicacao" name="explicacao" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="form-button">Adicionar Macete</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Tab de Edição JSON -->
+                <div id="tab-json" class="tab-content">
+                    <p>Edite diretamente o JSON dos macetes. Certifique-se de manter a estrutura correta.</p>
+                    <textarea id="json-editor" class="json-editor">{{ json_content }}</textarea>
+                    <div class="json-actions">
+                        <button id="save-json" class="form-button">Salvar Alterações</button>
+                    </div>
+                </div>
+                
+                <!-- Tab de Lista de Macetes -->
+                <div id="tab-lista" class="tab-content">
+                    <table class="macetes-table">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Nível</th>
+                                <th>Macete</th>
+                                <th>Abreviação</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for macete in macetes %}
+                                <tr data-index="{{ loop.index0 }}">
+                                    <td>{{ macete.classe }}</td>
+                                    <td>{{ macete.nivel }}</td>
+                                    <td>{{ macete.macete }}</td>
+                                    <td>{{ macete.abreviacao }}</td>
+                                    <td>
+                                        <button class="action-button delete" onclick="deleteMacete({{ loop.index0 }})">Excluir</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Alternar entre as tabs
+        const tabs = document.querySelectorAll('.admin-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Remover classe active de todas as tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Adicionar classe active à tab clicada
+                tab.classList.add('active');
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+            });
+        });
+        
+        // Mostrar campo de nova categoria quando selecionado
+        document.getElementById('classe').addEventListener('change', function() {
+            const novaCategoriaGroup = document.getElementById('nova-categoria-group');
+            if (this.value === 'nova') {
+                novaCategoriaGroup.style.display = 'block';
+            } else {
+                novaCategoriaGroup.style.display = 'none';
+            }
+        });
+        
+        // Adicionar novo macete
+        document.getElementById('add-macete-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let classe = document.getElementById('classe').value;
+            if (classe === 'nova') {
+                classe = document.getElementById('nova-categoria').value;
+                if (!classe) {
+                    showAlert('error', 'Por favor, informe o nome da nova categoria.');
+                    return;
+                }
+            }
+            
+            const nivel = document.getElementById('nivel').value;
+            const macete = document.getElementById('macete').value;
+            const abreviacao = document.getElementById('abreviacao').value;
+            const explicacao = document.getElementById('explicacao').value;
+            
+            const formData = new FormData();
+            formData.append('classe', classe);
+            formData.append('nivel', nivel);
+            formData.append('macete', macete);
+            formData.append('abreviacao', abreviacao);
+            formData.append('explicacao', explicacao);
+            
+            fetch('{{ url_for("macetes.add") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', data.message);
+                    // Limpar formulário
+                    document.getElementById('add-macete-form').reset();
+                    // Recarregar página após 2 segundos
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showAlert('error', data.message);
+                }
+            })
+            .catch(error => {
+                showAlert('error', 'Erro ao adicionar macete: ' + error);
+            });
+        });
+        
+        // Salvar JSON
+        document.getElementById('save-json').addEventListener('click', function() {
+            const jsonContent = document.getElementById('json-editor').value;
+            
+            try {
+                // Validar JSON
+                JSON.parse(jsonContent);
+                
+                const formData = new FormData();
+                formData.append('json_content', jsonContent);
+                
+                fetch('{{ url_for("macetes.save") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.message);
+                        // Recarregar página após 2 segundos
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showAlert('error', data.message);
+                    }
+                })
+                .catch(error => {
+                    showAlert('error', 'Erro ao salvar JSON: ' + error);
+                });
+            } catch (e) {
+                showAlert('error', 'JSON inválido: ' + e.message);
+            }
+        });
+        
+        // Excluir macete
+        function deleteMacete(index) {
+            if (confirm('Tem certeza que deseja excluir este macete?')) {
+                const formData = new FormData();
+                formData.append('index', index);
+                
+                fetch('{{ url_for("macetes.delete") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.message);
+                        // Remover linha da tabela
+                        document.querySelector(`tr[data-index="${index}"]`).remove();
+                        // Recarregar página após 2 segundos
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showAlert('error', data.message);
+                    }
+                })
+                .catch(error => {
+                    showAlert('error', 'Erro ao excluir macete: ' + error);
+                });
+            }
+        }
+        
+        // Exibir alertas
+        function showAlert(type, message) {
+            const alert = document.getElementById(`alert-${type}`);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            // Esconder alerta após 5 segundos
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
