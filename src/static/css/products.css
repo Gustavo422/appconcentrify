@@ -7,50 +7,102 @@
 }
 
 .product-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fafaf7; /* Off-white com leve tom amarelado */
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); /* Sombra mais pronunciada */
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
     height: 100%;
     display: flex;
     flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.05); /* Borda sutil para melhor definição */
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); /* Sombra ainda mais pronunciada no hover */
+    background-color: #fcfcf8; /* Leve clareamento no hover */
+}
+
+.product-image-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* Cria um quadrado perfeito */
+    overflow: hidden;
+    border-radius: 8px 8px 0 0; /* Bordas arredondadas apenas no topo */
 }
 
 .product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 180px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: cover; /* Muda para cover para preencher todo o espaço */
+    background-color: #f8f9fa;
+    padding: 0; /* Remove o padding */
 }
 
 .product-content {
-    padding: 15px;
+    padding: 24px 24px 0 24px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
 
 .product-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #333;
+    font-size: 24px;
+    font-weight: 800;
+    color: #111;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -0.02em;
 }
 
 .product-description {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 15px;
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
     flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 400;
+    letter-spacing: 0.01em;
 }
 
 .product-action {
-    margin-top: auto;
+    margin-top: 24px;
+    padding: 0 24px 24px 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.product-action .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+}
+
+.product-action .btn:hover {
+    background-color: #303f9f;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(63, 81, 181, 0.2);
 }
 
 .section-title {
@@ -160,19 +212,52 @@
     padding-bottom: 0;
 }
 
-/* Responsividade */
+/* Ajuste do container principal para melhor contraste */
+.card {
+    background-color: #f5f5f0; /* Fundo do container principal mais escuro */
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    padding: 32px;
+}
+
+/* Ajuste responsivo para o container */
 @media (max-width: 768px) {
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 15px;
     }
     
-    .product-image {
-        height: 140px;
+    .product-image-container {
+        padding-bottom: 100%; /* Mantém o quadrado em mobile */
+    }
+    
+    .product-content {
+        padding: 20px 20px 0 20px;
+        gap: 12px;
     }
     
     .product-title {
-        font-size: 16px;
+        font-size: 20px;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+    }
+    
+    .product-description {
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-line-clamp: 2;
+        color: #666;
+    }
+    
+    .product-action {
+        margin-top: 20px;
+        padding: 0 20px 20px 20px;
+    }
+    
+    .product-action .btn {
+        padding: 12px;
+        font-size: 15px;
+        border-radius: 6px;
     }
     
     .pdf-container, .notes-style-container {
@@ -181,5 +266,38 @@
     
     .pdf-title, .notes-title {
         font-size: 20px;
+    }
+    
+    .card {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 360px) {
+    .product-content {
+        padding: 16px 16px 0 16px;
+        gap: 10px;
+    }
+
+    .product-title {
+        font-size: 18px;
+    }
+    
+    .product-description {
+        font-size: 13px;
+    }
+    
+    .product-action {
+        margin-top: 16px;
+        padding: 0 16px 16px 16px;
+    }
+    
+    .product-action .btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .card {
+        padding: 20px;
     }
 }

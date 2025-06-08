@@ -22,6 +22,7 @@ def login():
             db.session.commit()
             
             # Cria a sessão
+            session.permanent = True  # Torna a sessão permanente
             session['user_id'] = user.id
             session['email'] = user.email
             session['is_admin'] = user.is_admin
@@ -31,7 +32,7 @@ def login():
             if user.is_admin:
                 return redirect(url_for('admin.dashboard'))
             else:
-                return redirect(url_for('main.dashboard'))
+                return redirect(url_for('products.index'))  # Redireciona para produtos em vez de dashboard
         else:
             flash('Email não encontrado', 'error')
     

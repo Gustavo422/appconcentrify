@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Produtos - Concentrify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-menu">
+                <a href="{{ url_for('products.index') }}">Produtos</a>
+                <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
+                <a href="{{ url_for('admin.list_products') }}" class="active">Gerenciar Produtos</a>
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Gerenciar Produtos</h1>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Descrição</th>
+                            <th>Tipo</th>
+                            <th>Principal?</th>
+                            <th>Ordem</th>
+                            <th>Imagem</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.title }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>{{ product.content_type }}</td>
+                            <td>{{ "Sim" if product.is_main else "Não" }}</td>
+                            <td>{{ product.order }}</td>
+                            <td>{{ product.cover_image }}</td>
+                            <td>
+                                <form action="{{ url_for('admin.delete_product', product_id=product.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir este produto?')">Excluir</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

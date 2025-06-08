@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Simulado - Concentrify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+    <style>
+        /* Estilos específicos para criação de simulado */
+        .novo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .novo-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .novo-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .novo-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin: 0;
+        }
+        
+        .novo-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .novo-form {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: #3f51b5;
+            outline: none;
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .form-actions {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-voltar:hover {
+            background: #5a6268;
+        }
+        
+        .btn-criar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-criar:hover {
+            background: #218838;
+        }
+        
+        .form-error {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .novo-container {
+                padding: 15px;
+            }
+            
+            .novo-form {
+                padding: 20px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .btn-voltar, .btn-criar {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .checkbox-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-menu">
+                <a href="{{ url_for('products.index') }}">Produtos</a>
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
+                <a href="{{ url_for('simulados.admin') }}">Gerenciar Simulados</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="novo-container">
+            <div class="novo-header">
+                <h1 class="novo-title">Criar Simulado</h1>
+                <p class="novo-subtitle">Adicione um novo simulado à plataforma</p>
+            </div>
+            
+            <div class="novo-card">
+                <form method="POST" action="{{ url_for('simulados.novo') }}" class="novo-form">
+                    <div class="form-group">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" id="titulo" name="titulo" class="form-control" required>
+                        {% if form.titulo.errors %}
+                        <div class="form-error">{{ form.titulo.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea id="descricao" name="descricao" class="form-control"></textarea>
+                        {% if form.descricao.errors %}
+                        <div class="form-error">{{ form.descricao.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Matérias</label>
+                        <div class="checkbox-group">
+                            {% for materia in materias %}
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="materias" value="{{ materia }}">
+                                <span>{{ materia }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% if form.materias.errors %}
+                        <div class="form-error">{{ form.materias.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="ativo" checked>
+                                <span>Ativo</span>
+                            </label>
+                        </div>
+                        {% if form.ativo.errors %}
+                        <div class="form-error">{{ form.ativo.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                </form>
+                
+                <div class="form-actions">
+                    <a href="{{ url_for('simulados.admin') }}" class="btn-voltar">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar
+                    </a>
+                    <button type="submit" form="novoForm" class="btn-criar">
+                        <i class="fas fa-plus"></i>
+                        Criar Simulado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -10,9 +10,7 @@
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Concentrify Logo" class="navbar-logo">
             <div class="navbar-menu">
-                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
                 <a href="{{ url_for('products.index') }}">Produtos</a>
                 {% if session.get('is_admin') %}
                 <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
@@ -40,14 +38,22 @@
                 <div class="product-grid">
                     {% for product in main_products %}
                     <div class="product-card">
-                        <img src="{{ url_for('static', filename='uploads/products/' + product.cover_image) }}" alt="{{ product.title }}" class="product-image">
+                        <div class="product-image-container">
+                            <img src="{{ url_for('static', filename='uploads/products/' + product.cover_image) }}" alt="{{ product.title }}" class="product-image">
+                        </div>
                         <div class="product-content">
                             <h3 class="product-title">{{ product.title }}</h3>
                             {% if product.description %}
                             <p class="product-description">{{ product.description }}</p>
                             {% endif %}
                             <div class="product-action">
-                                <a href="{{ url_for('products.view_pdf', id=product.id) }}" class="btn">Visualizar</a>
+                                {% if product.content_type == 'simulados' %}
+                                <a href="{{ url_for('simulados.index') }}" class="btn">Visualizar</a>
+                                {% elif product.content_type == 'macetes' %}
+                                <a href="{{ url_for('macetes.index') }}" class="btn">Visualizar</a>
+                                {% else %}
+                                <a href="{{ url_for('products.view_pdf', product_id=product.id) }}" class="btn">Visualizar</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -60,14 +66,22 @@
                 <div class="product-grid">
                     {% for product in bonus_products %}
                     <div class="product-card">
-                        <img src="{{ url_for('static', filename='uploads/products/' + product.cover_image) }}" alt="{{ product.title }}" class="product-image">
+                        <div class="product-image-container">
+                            <img src="{{ url_for('static', filename='uploads/products/' + product.cover_image) }}" alt="{{ product.title }}" class="product-image">
+                        </div>
                         <div class="product-content">
                             <h3 class="product-title">{{ product.title }}</h3>
                             {% if product.description %}
                             <p class="product-description">{{ product.description }}</p>
                             {% endif %}
                             <div class="product-action">
-                                <a href="{{ url_for('products.view_pdf', id=product.id) }}" class="btn">Visualizar</a>
+                                {% if product.content_type == 'simulados' %}
+                                <a href="{{ url_for('simulados.index') }}" class="btn">Visualizar</a>
+                                {% elif product.content_type == 'macetes' %}
+                                <a href="{{ url_for('macetes.index') }}" class="btn">Visualizar</a>
+                                {% else %}
+                                <a href="{{ url_for('products.view_pdf', product_id=product.id) }}" class="btn">Visualizar</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

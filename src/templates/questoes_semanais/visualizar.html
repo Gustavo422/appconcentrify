@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>{{ questoes_semanais.titulo }}</h1>
+            <p class="text-muted">
+                Semana de {{ questoes_semanais.semana_referencia.strftime('%d/%m/%Y') }}
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('questoes_semanais.responder_questoes_semanais', id=questoes_semanais.id) }}" 
+               class="btn btn-success">
+                Responder Online
+            </a>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Descrição</h5>
+            <p class="card-text">{{ questoes_semanais.descricao }}</p>
+            <div class="d-flex gap-2">
+                <span class="badge bg-primary">{{ questoes_semanais.total_questoes }} questões</span>
+                {% for materia in questoes_semanais.materias.split(',') %}
+                <span class="badge bg-secondary">{{ materia }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="questoes">
+        {% for questao in questoes_semanais.questoes %}
+        <div class="card mb-4 questao" id="questao-{{ questao.numero }}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Questão {{ questao.numero }}</h5>
+                <span class="badge bg-info">{{ questao.materia }}</span>
+            </div>
+            <div class="card-body">
+                <div class="questao-enunciado mb-4">
+                    {{ questao.enunciado|safe }}
+                </div>
+                
+                <div class="alternativas">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="q{{ questao.id }}" 
+                               id="q{{ questao.id }}_a" value="A" disabled>
+                        <label class="form-check-label" for="q{{ questao.id }}_a">
+                            A) {{ questao.alternativa_a }}
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="q{{ questao.id }}" 
+                               id="q{{ questao.id }}_b" value="B" disabled>
+                        <label class="form-check-label" for="q{{ questao.id }}_b">
+                            B) {{ questao.alternativa_b }}
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="q{{ questao.id }}" 
+                               id="q{{ questao.id }}_c" value="C" disabled>
+                        <label class="form-check-label" for="q{{ questao.id }}_c">
+                            C) {{ questao.alternativa_c }}
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="q{{ questao.id }}" 
+                               id="q{{ questao.id }}_d" value="D" disabled>
+                        <label class="form-check-label" for="q{{ questao.id }}_d">
+                            D) {{ questao.alternativa_d }}
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="q{{ questao.id }}" 
+                               id="q{{ questao.id }}_e" value="E" disabled>
+                        <label class="form-check-label" for="q{{ questao.id }}_e">
+                            E) {{ questao.alternativa_e }}
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-sm btn-outline-primary mostrar-resposta" 
+                            data-questao="{{ questao.id }}">
+                        Mostrar Resposta
+                    </button>
+                    <div class="resposta-correta mt-2 d-none" id="resposta-{{ questao.id }}">
+                        <div class="alert alert-success">
+                            Resposta correta: {{ questao.resposta_correta }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar/ocultar respostas
+    document.querySelectorAll('.mostrar-resposta').forEach(button => {
+        button.addEventListener('click', function() {
+            const questaoId = this.dataset.questao;
+            const respostaDiv = document.getElementById(`resposta-${questaoId}`);
+            
+            if (respostaDiv.classList.contains('d-none')) {
+                respostaDiv.classList.remove('d-none');
+                this.textContent = 'Ocultar Resposta';
+            } else {
+                respostaDiv.classList.add('d-none');
+                this.textContent = 'Mostrar Resposta';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

@@ -11,8 +11,9 @@
         <div class="navbar-container">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Concentrify Logo" class="navbar-logo">
             <div class="navbar-menu">
-                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
+                <a href="{{ url_for('products.index') }}">Produtos</a>
+                <a href="{{ url_for('admin.list_users') }}" class="active">Gerenciar Usuários</a>
+                <a href="{{ url_for('simulados.admin') }}">Gerenciar Simulados</a>
                 <a href="{{ url_for('auth.logout') }}">Sair</a>
             </div>
         </div>

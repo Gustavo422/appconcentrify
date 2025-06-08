@@ -6,7 +6,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     if session.get('user_id'):
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('products.index'))
     return redirect(url_for('auth.login'))
 
 @main_bp.route('/dashboard')
@@ -15,10 +15,10 @@ def dashboard():
         flash('Faça login para acessar esta página', 'error')
         return redirect(url_for('auth.login'))
     
-    # Buscar produtos principais e bônus para exibir no dashboard
+    # Buscar produtos do banco de dados
     main_products = Product.query.filter_by(is_main=True).order_by(Product.order).all()
     bonus_products = Product.query.filter_by(is_main=False).order_by(Product.order).all()
     
     return render_template('public/dashboard.html', 
-                          main_products=main_products, 
-                          bonus_products=bonus_products)
+                         main_products=main_products, 
+                         bonus_products=bonus_products)

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Simulado - {{ simulado.titulo }} - Concentrify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+    <style>
+        /* Estilos específicos para início do simulado */
+        .iniciar-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .iniciar-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .iniciar-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .iniciar-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin: 0;
+        }
+        
+        .iniciar-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .iniciar-info {
+            padding: 30px;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+        }
+        
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 15px 0;
+        }
+        
+        .info-content {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-item i {
+            color: #3f51b5;
+            font-size: 1.1em;
+        }
+        
+        .materias-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .materia-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .iniciar-actions {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .btn-iniciar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-iniciar:hover {
+            background: #218838;
+        }
+        
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            margin-right: 15px;
+        }
+        
+        .btn-voltar:hover {
+            background: #5a6268;
+        }
+        
+        .checkbox-group {
+            margin-top: 20px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            color: #666;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .iniciar-container {
+                padding: 15px;
+            }
+            
+            .iniciar-info {
+                padding: 20px;
+            }
+            
+            .iniciar-actions {
+                padding: 15px;
+            }
+            
+            .btn-iniciar, .btn-voltar {
+                display: block;
+                width: 100%;
+                justify-content: center;
+                margin: 10px 0;
+            }
+            
+            .btn-voltar {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-menu">
+                <a href="{{ url_for('products.index') }}">Produtos</a>
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
+                <a href="{{ url_for('simulados.admin') }}">Gerenciar Simulados</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="iniciar-container">
+            <div class="iniciar-header">
+                <h1 class="iniciar-title">{{ simulado.titulo }}</h1>
+                <p class="iniciar-subtitle">Prepare-se para iniciar o simulado</p>
+            </div>
+            
+            <div class="iniciar-card">
+                <div class="iniciar-info">
+                    <div class="info-section">
+                        <h2 class="info-title">Informações do Simulado</h2>
+                        <div class="info-content">
+                            {% if simulado.descricao %}
+                            <p>{{ simulado.descricao }}</p>
+                            {% endif %}
+                            
+                            <ul class="info-list">
+                                <li class="info-item">
+                                    <i class="fas fa-list-ol"></i>
+                                    {{ simulado.total_questoes }} questões
+                                </li>
+                                <li class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    Tempo estimado: {{ tempo_estimado }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h2 class="info-title">Matérias</h2>
+                        <div class="materias-list">
+                            {% for materia in simulado.materias %}
+                            <span class="materia-tag">{{ materia }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h2 class="info-title">Instruções</h2>
+                        <div class="info-content">
+                            <ul class="info-list">
+                                <li class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    Leia atentamente cada questão antes de responder
+                                </li>
+                                <li class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    Você pode navegar entre as questões usando os botões de navegação
+                                </li>
+                                <li class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    Após responder uma questão, você poderá revisá-la posteriormente
+                                </li>
+                                <li class="info-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    Ao finalizar, você receberá um relatório detalhado do seu desempenho
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('simulados.iniciar', simulado_id=simulado.id) }}" id="iniciarForm">
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="confirmar" required>
+                                <span>Li e compreendi todas as instruções</span>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="iniciar-actions">
+                    <a href="{{ url_for('simulados.index') }}" class="btn-voltar">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar
+                    </a>
+                    <button type="submit" form="iniciarForm" class="btn-iniciar">
+                        <i class="fas fa-play"></i>
+                        Iniciar Simulado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

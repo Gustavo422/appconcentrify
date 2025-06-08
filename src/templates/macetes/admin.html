@@ -238,9 +238,7 @@
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Concentrify Logo" class="navbar-logo">
             <div class="navbar-menu">
-                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
                 <a href="{{ url_for('products.index') }}">Produtos</a>
                 {% if session.get('is_admin') %}
                 <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>

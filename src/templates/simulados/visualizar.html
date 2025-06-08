@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ simulado.titulo }} - Concentrify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+    <style>
+        /* Estilos específicos para visualização de simulado */
+        .simulado-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .simulado-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .simulado-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .simulado-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin: 0;
+        }
+        
+        .simulado-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .simulado-content {
+            padding: 30px;
+        }
+        
+        .simulado-info {
+            margin-bottom: 25px;
+        }
+        
+        .simulado-info:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .info-value {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .simulado-metricas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metrica-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .metrica-valor {
+            font-size: 32px;
+            font-weight: 600;
+            color: #3f51b5;
+            margin: 0 0 5px 0;
+        }
+        
+        .metrica-label {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .simulado-actions {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-voltar:hover {
+            background: #5a6268;
+        }
+        
+        .btn-iniciar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-iniciar:hover {
+            background: #218838;
+        }
+        
+        @media (max-width: 768px) {
+            .simulado-container {
+                padding: 15px;
+            }
+            
+            .simulado-content {
+                padding: 20px;
+            }
+            
+            .simulado-metricas {
+                grid-template-columns: 1fr;
+            }
+            
+            .simulado-actions {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .btn-voltar, .btn-iniciar {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-menu">
+                <a href="{{ url_for('products.index') }}">Produtos</a>
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin.list_users') }}">Gerenciar Usuários</a>
+                <a href="{{ url_for('simulados.admin') }}">Gerenciar Simulados</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="simulado-container">
+            <div class="simulado-header">
+                <h1 class="simulado-title">{{ simulado.titulo }}</h1>
+                <p class="simulado-subtitle">{{ simulado.descricao }}</p>
+            </div>
+            
+            <div class="simulado-card">
+                <div class="simulado-content">
+                    <div class="simulado-metricas">
+                        <div class="metrica-card">
+                            <p class="metrica-valor">{{ simulado.num_questoes }}</p>
+                            <p class="metrica-label">Questões</p>
+                        </div>
+                        
+                        <div class="metrica-card">
+                            <p class="metrica-valor">{{ simulado.tempo_limite }}</p>
+                            <p class="metrica-label">Minutos</p>
+                        </div>
+                        
+                        <div class="metrica-card">
+                            <p class="metrica-valor">{{ simulado.pontuacao_maxima }}</p>
+                            <p class="metrica-label">Pontos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="simulado-info">
+                        <span class="info-label">Instruções</span>
+                        <p class="info-value">
+                            • O simulado possui {{ simulado.num_questoes }} questões de múltipla escolha.<br>
+                            • Você terá {{ simulado.tempo_limite }} minutos para completar o simulado.<br>
+                            • Cada questão vale {{ simulado.pontuacao_maxima / simulado.num_questoes }} pontos.<br>
+                            • Não é possível voltar para questões anteriores após respondê-las.<br>
+                            • O simulado será finalizado automaticamente ao atingir o tempo limite.<br>
+                            • Certifique-se de ter um ambiente adequado antes de iniciar.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="simulado-actions">
+                    <a href="{{ url_for('products.index') }}" class="btn-voltar">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar aos Produtos
+                    </a>
+                    <a href="{{ url_for('simulados.realizar', simulado_id=simulado.id) }}" class="btn-iniciar">
+                        <i class="fas fa-play"></i>
+                        Iniciar Simulado
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

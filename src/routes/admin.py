@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from src.models.user import db, User
+from src.models.product import Product
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -101,3 +102,27 @@ def delete_user(id):
     
     flash('Usuário excluído com sucesso!', 'success')
     return redirect(url_for('admin.list_users'))
+
+@admin_bp.route('/products')
+def list_products():
+    if not session.get('user_id') or not session.get('is_admin'):
+        flash('Acesso restrito a administradores', 'error')
+        return redirect(url_for('auth.login'))
+    
+    # Buscar todos os produtos
+    products = Product.query.order_by(Product.title).all()
+    
+    return render_template('admin/products.html', products=products)
+
+@admin_bp.route('/products/<int:product_id>/delete', methods=['POST'])
+def delete_product(product_id):
+    if not session.get('user_id') or not session.get('is_admin'):
+        flash('Acesso restrito a administradores', 'error')
+        return redirect(url_for('auth.login'))
+    
+    product = Product.query.get_or_404(product_id)
+    db.session.delete(product)
+    db.session.commit()
+    
+    flash('Produto excluído com sucesso!', 'success')
+    return redirect(url_for('admin.list_products'))
