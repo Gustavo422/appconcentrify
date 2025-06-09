@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Concentrify - Plataforma educacional para concursos públicos">
+    <meta name="keywords" content="concursos, educação, simulados, macetes, questões">
+    <meta name="author" content="Concentrify">
+    
+    <title><%= title || 'Concentrify' %></title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    
+    <!-- CSS -->
+    <link href="/css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Meta tags para SEO -->
+    <meta property="og:title" content="<%= title || 'Concentrify' %>">
+    <meta property="og:description" content="Plataforma educacional para concursos públicos">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= process.env.FRONTEND_URL || 'http://localhost:3000' %>">
+    
+    <% if (typeof extraHead !== 'undefined') { %>
+        <%- extraHead %>
+    <% } %>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navbar -->
+    <nav class="navbar sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/products" class="navbar-brand">
+                        <i class="fas fa-graduation-cap mr-2"></i>
+                        Concentrify
+                    </a>
+                </div>
+                
+                <!-- Menu Principal -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/products" class="nav-link <%= currentPath === '/products' ? 'nav-link-active' : 'nav-link-inactive' %>">
+                        <i class="fas fa-box mr-2"></i>
+                        Produtos
+                    </a>
+                    
+                    <% if (isAdmin) { %>
+                        <div class="relative group">
+                            <button class="nav-link nav-link-inactive flex items-center">
+                                <i class="fas fa-cog mr-2"></i>
+                                Administração
+                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-medium border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                <a href="/admin/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                    <i class="fas fa-tachometer-alt mr-2"></i>
+                                    Dashboard
+                                </a>
+                                <a href="/admin/users" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-users mr-2"></i>
+                                    Usuários
+                                </a>
+                                <a href="/simulados/admin" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-clipboard-list mr-2"></i>
+                                    Simulados
+                                </a>
+                                <a href="/macetes/admin" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-lightbulb mr-2"></i>
+                                    Macetes
+                                </a>
+                                <a href="/questoes-semanais/admin" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
+                                    <i class="fas fa-calendar-week mr-2"></i>
+                                    Questões Semanais
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Menu do Usuário -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative group">
+                        <button class="flex items-center text-sm text-gray-700 hover:text-gray-900">
+                            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2">
+                                <i class="fas fa-user text-primary-600"></i>
+                            </div>
+                            <span class="hidden md:block"><%= user?.email || 'Usuário' %></span>
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-medium border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <div class="px-4 py-2 border-b border-gray-200">
+                                <p class="text-sm font-medium text-gray-900 truncate"><%= user?.email %></p>
+                                <% if (isAdmin) { %>
+                                    <p class="text-xs text-primary-600">Administrador</p>
+                                <% } %>
+                            </div>
+                            <form action="/auth/logout" method="POST" class="block">
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>
+                                    Sair
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Menu Mobile -->
+                    <button class="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Menu Mobile -->
+        <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 bg-white">
+            <div class="px-4 py-2 space-y-1">
+                <a href="/products" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-box mr-2"></i>
+                    Produtos
+                </a>
+                
+                <% if (isAdmin) { %>
+                    <div class="border-t border-gray-200 pt-2 mt-2">
+                        <p class="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">Administração</p>
+                        <a href="/admin/dashboard" class="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-tachometer-alt mr-2"></i>
+                            Dashboard
+                        </a>
+                        <a href="/admin/users" class="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-users mr-2"></i>
+                            Usuários
+                        </a>
+                        <a href="/simulados/admin" class="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-clipboard-list mr-2"></i>
+                            Simulados
+                        </a>
+                        <a href="/macetes/admin" class="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-lightbulb mr-2"></i>
+                            Macetes
+                        </a>
+                        <a href="/questoes-semanais/admin" class="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-calendar-week mr-2"></i>
+                            Questões Semanais
+                        </a>
+                    </div>
+                <% } %>
+                
+                <div class="border-t border-gray-200 pt-2 mt-2">
+                    <form action="/auth/logout" method="POST">
+                        <button type="submit" class="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            Sair
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    <% if (messages && (messages.success || messages.error || messages.warning || messages.info)) { %>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <% if (messages.success) { %>
+                <% messages.success.forEach(message => { %>
+                    <div class="alert alert-success mb-4 fade-in">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <% if (messages.error) { %>
+                <% messages.error.forEach(message => { %>
+                    <div class="alert alert-error mb-4 fade-in">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <% if (messages.warning) { %>
+                <% messages.warning.forEach(message => { %>
+                    <div class="alert alert-warning mb-4 fade-in">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <% if (messages.info) { %>
+                <% messages.info.forEach(message => { %>
+                    <div class="alert alert-info mb-4 fade-in">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    <% } %>
+    
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <%- body %>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center text-gray-600">
+                <p>&copy; <%= new Date().getFullYear() %> Concentrify. Todos os direitos reservados.</p>
+                <p class="text-sm mt-2">Plataforma educacional para concursos públicos</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Auto-hide flash messages
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+    
+    <% if (typeof extraScripts !== 'undefined') { %>
+        <%- extraScripts %>
+    <% } %>
+</body>
+</html>

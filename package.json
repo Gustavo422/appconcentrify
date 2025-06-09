@@ -1,0 +1,51 @@
+{
+  "name": "concentrify-webapp",
+  "version": "1.0.0",
+  "description": "Aplicação web para gerenciamento de conteúdo educacional, simulados e macetes para concursos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "npm run build:css",
+    "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
+    "setup": "node scripts/setup.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "education",
+    "concursos",
+    "simulados",
+    "macetes"
+  ],
+  "author": "Concentrify Team",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "joi": "^17.11.0",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.3.1",
+    "express-validator": "^7.0.1",
+    "connect-flash": "^0.1.1",
+    "morgan": "^1.10.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "tailwindcss": "^3.3.6",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

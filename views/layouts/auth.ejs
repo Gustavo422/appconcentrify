@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Concentrify - Login">
+    
+    <title><%= title || 'Login - Concentrify' %></title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    
+    <!-- CSS -->
+    <link href="/css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <% if (typeof extraHead !== 'undefined') { %>
+        <%- extraHead %>
+    <% } %>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-white bg-opacity-50">
+        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    </div>
+    
+    <!-- Flash Messages -->
+    <% if (messages && (messages.success || messages.error || messages.warning || messages.info)) { %>
+        <div class="fixed top-4 right-4 z-50 space-y-2">
+            <% if (messages.success) { %>
+                <% messages.success.forEach(message => { %>
+                    <div class="alert alert-success fade-in shadow-medium">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <% if (messages.error) { %>
+                <% messages.error.forEach(message => { %>
+                    <div class="alert alert-error fade-in shadow-medium">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <% if (messages.warning) { %>
+                <% messages.warning.forEach(message => { %>
+                    <div class="alert alert-warning fade-in shadow-medium">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <% if (messages.info) { %>
+                <% messages.info.forEach(message => { %>
+                    <div class="alert alert-info fade-in shadow-medium">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span><%= message %></span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    <% } %>
+    
+    <!-- Conteúdo Principal -->
+    <div class="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <%- body %>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide flash messages
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+    
+    <% if (typeof extraScripts !== 'undefined') { %>
+        <%- extraScripts %>
+    <% } %>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
+            <p class="mt-2 text-gray-600">Visão geral do sistema Concentrify</p>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="text-sm text-gray-500">
+                <i class="fas fa-clock mr-1"></i>
+                Última atualização: <%= new Date().toLocaleString('pt-BR') %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estatísticas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card hover-lift">
+            <div class="card-body">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-primary-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Total de Usuários</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= stats.users %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card hover-lift">
+            <div class="card-body">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-success-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-box text-success-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Produtos</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= stats.products %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card hover-lift">
+            <div class="card-body">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-warning-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-clipboard-list text-warning-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Simulados</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= stats.simulados %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card hover-lift">
+            <div class="card-body">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-secondary-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Atividade</p>
+                        <p class="text-2xl font-bold text-gray-900">100%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ações Rápidas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Ações Rápidas -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-bolt mr-2 text-primary-600"></i>
+                    Ações Rápidas
+                </h3>
+            
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a href="/admin/users/new" class="flex items-center p-4 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-user-plus text-primary-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">Novo Usuário</p>
+                            <p class="text-sm text-gray-600">Adicionar usuário</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/simulados/admin" class="flex items-center p-4 bg-success-50 rounded-lg hover:bg-success-100 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-clipboard-list text-success-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">Simulados</p>
+                            <p class="text-sm text-gray-600">Gerenciar simulados</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/macetes/admin" class="flex items-center p-4 bg-warning-50 rounded-lg hover:bg-warning-100 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-warning-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-lightbulb text-warning-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">Macetes</p>
+                            <p class="text-sm text-gray-600">Gerenciar macetes</p>
+                        </div>
+                    </a>
+                    
+                    <a href="/questoes-semanais/admin" class="flex items-center p-4 bg-secondary-50 rounded-lg hover:bg-secondary-100 transition-colors duration-200">
+                        <div class="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-calendar-week text-secondary-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">Questões</p>
+                            <p class="text-sm text-gray-600">Questões semanais</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Usuários Recentes -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-users mr-2 text-primary-600"></i>
+                    Usuários Recentes
+                </h3>
+            </div>
+            <div class="card-body">
+                <% if (recentUsers && recentUsers.length > 0) { %>
+                    <div class="space-y-4">
+                        <% recentUsers.forEach(user => { %>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                        <i class="fas fa-user text-primary-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900"><%= user.email %></p>
+                                        <p class="text-sm text-gray-600">
+                                            Criado em <%= new Date(user.created_at).toLocaleDateString('pt-BR') %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <% if (user.is_admin) { %>
+                                        <span class="badge badge-primary">Admin</span>
+                                    <% } %>
+                                    <% if (user.last_login) { %>
+                                        <span class="badge badge-success">Ativo</span>
+                                    <% } else { %>
+                                        <span class="badge badge-gray">Novo</span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <a href="/admin/users" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                            Ver todos os usuários
+                            <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-8">
+                        <i class="fas fa-users text-gray-300 text-3xl mb-4"></i>
+                        <p class="text-gray-500">Nenhum usuário encontrado</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informações do Sistema -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-info-circle mr-2 text-primary-600"></i>
+                Informações do Sistema
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-server text-primary-600 text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900">Servidor</h4>
+                    <p class="text-sm text-gray-600 mt-1">Node.js + Express</p>
+                    <p class="text-xs text-gray-500 mt-1">Versão 1.0.0</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-database text-success-600 text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900">Banco de Dados</h4>
+                    <p class="text-sm text-gray-600 mt-1">Supabase PostgreSQL</p>
+                    <p class="text-xs text-gray-500 mt-1">Conectado</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-warning-600 text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900">Segurança</h4>
+                    <p class="text-sm text-gray-600 mt-1">JWT + Sessions</p>
+                    <p class="text-xs text-gray-500 mt-1">Ativo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

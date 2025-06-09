@@ -1,0 +1,107 @@
+<div class="max-w-md w-full space-y-8">
+    <!-- Logo e Título -->
+    <div class="text-center">
+        <div class="mx-auto h-16 w-16 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow">
+            <i class="fas fa-graduation-cap text-2xl text-white"></i>
+        </div>
+        <h2 class="mt-6 text-3xl font-bold text-gray-900">
+            Bem-vindo ao Concentrify
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+            Faça login para acessar sua conta
+        </p>
+    </div>
+    
+    <!-- Formulário de Login -->
+    <div class="card">
+        <div class="card-body">
+            <form action="/auth/login" method="POST" class="space-y-6">
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                        Email
+                    </label>
+                    <input 
+                        id="email" 
+                        name="email" 
+                        type="email" 
+                        autocomplete="email" 
+                        required 
+                        class="form-input"
+                        placeholder="seu@email.com"
+                        autofocus
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock mr-2 text-gray-400"></i>
+                        Senha
+                    </label>
+                    <div class="relative">
+                        <input 
+                            id="password" 
+                            name="password" 
+                            type="password" 
+                            autocomplete="current-password" 
+                            required 
+                            class="form-input pr-10"
+                            placeholder="••••••••"
+                        >
+                        <button 
+                            type="button" 
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            onclick="togglePassword()"
+                        >
+                            <i id="passwordIcon" class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div>
+                    <button type="submit" class="btn btn-primary w-full btn-lg">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Entrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Informações Adicionais -->
+    <div class="text-center">
+        <div class="bg-white rounded-lg p-4 shadow-soft border border-gray-200">
+            <h3 class="text-sm font-medium text-gray-900 mb-2">
+                <i class="fas fa-info-circle text-primary-500 mr-2"></i>
+                Credenciais de Teste
+            </h3>
+            <div class="text-xs text-gray-600 space-y-1">
+                <p><strong>Admin:</strong> admin@concentrify.com</p>
+                <p><strong>Senha:</strong> admin123</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const passwordIcon = document.getElementById('passwordIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordIcon.classList.remove('fa-eye');
+        passwordIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        passwordIcon.classList.remove('fa-eye-slash');
+        passwordIcon.classList.add('fa-eye');
+    }
+}
+
+// Adicionar animação de entrada
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.card');
+    form.classList.add('slide-up');
+});
+</script>

@@ -1,0 +1,392 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos customizados */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+  
+  /* Melhorar a aparência dos inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  textarea,
+  select {
+    @apply transition-colors duration-200;
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="date"]:focus,
+  textarea:focus,
+  select:focus {
+    @apply ring-2 ring-primary-500 border-primary-500;
+  }
+}
+
+@layer components {
+  /* Botões */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
+  }
+  
+  .btn-success {
+    @apply bg-success-600 text-white hover:bg-success-700 focus:ring-success-500;
+  }
+  
+  .btn-warning {
+    @apply bg-warning-600 text-white hover:bg-warning-700 focus:ring-warning-500;
+  }
+  
+  .btn-error {
+    @apply bg-error-600 text-white hover:bg-error-700 focus:ring-error-500;
+  }
+  
+  .btn-outline {
+    @apply bg-transparent border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+  
+  /* Cards */
+  .card {
+    @apply bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden;
+  }
+  
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-200 bg-gray-50;
+  }
+  
+  .card-body {
+    @apply px-6 py-4;
+  }
+  
+  .card-footer {
+    @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
+  }
+  
+  /* Formulários */
+  .form-group {
+    @apply mb-4;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+  }
+  
+  .form-input {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+  }
+  
+  .form-textarea {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-vertical;
+  }
+  
+  .form-select {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+  }
+  
+  .form-error {
+    @apply mt-1 text-sm text-error-600;
+  }
+  
+  /* Alertas */
+  .alert {
+    @apply px-4 py-3 rounded-lg border;
+  }
+  
+  .alert-success {
+    @apply bg-success-50 border-success-200 text-success-800;
+  }
+  
+  .alert-warning {
+    @apply bg-warning-50 border-warning-200 text-warning-800;
+  }
+  
+  .alert-error {
+    @apply bg-error-50 border-error-200 text-error-800;
+  }
+  
+  .alert-info {
+    @apply bg-primary-50 border-primary-200 text-primary-800;
+  }
+  
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800;
+  }
+  
+  .badge-success {
+    @apply bg-success-100 text-success-800;
+  }
+  
+  .badge-warning {
+    @apply bg-warning-100 text-warning-800;
+  }
+  
+  .badge-error {
+    @apply bg-error-100 text-error-800;
+  }
+  
+  .badge-gray {
+    @apply bg-gray-100 text-gray-800;
+  }
+  
+  /* Navegação */
+  .nav-link {
+    @apply px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200;
+  }
+  
+  .nav-link-active {
+    @apply bg-primary-100 text-primary-700;
+  }
+  
+  .nav-link-inactive {
+    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100;
+  }
+  
+  /* Tabelas */
+  .table {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+  
+  .table-header {
+    @apply bg-gray-50;
+  }
+  
+  .table-header-cell {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+  }
+  
+  .table-body {
+    @apply bg-white divide-y divide-gray-200;
+  }
+  
+  .table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  }
+  
+  /* Modais */
+  .modal-overlay {
+    @apply fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50;
+  }
+  
+  .modal-container {
+    @apply relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-xl bg-white;
+  }
+  
+  /* Animações */
+  .fade-in {
+    @apply animate-fade-in;
+  }
+  
+  .slide-up {
+    @apply animate-slide-up;
+  }
+  
+  .slide-down {
+    @apply animate-slide-down;
+  }
+  
+  /* Utilitários */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
+  }
+  
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-primary-500 to-primary-600;
+  }
+  
+  .bg-gradient-secondary {
+    @apply bg-gradient-to-r from-secondary-500 to-secondary-600;
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(63, 81, 181, 0.3);
+  }
+  
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+}
+
+@layer utilities {
+  /* Scrollbar customizada */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175) rgb(243 244 246);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(243 244 246);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(156 163 175);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(107 114 128);
+  }
+  
+  /* Truncate text */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Aspect ratios */
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+  
+  .aspect-video {
+    aspect-ratio: 16 / 9;
+  }
+  
+  .aspect-photo {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* Estilos específicos para componentes */
+.product-card {
+  @apply card hover-lift transition-all duration-300 hover:shadow-medium;
+}
+
+.product-image {
+  @apply w-full h-48 object-cover;
+}
+
+.simulado-card {
+  @apply card hover-lift transition-all duration-300 hover:shadow-medium border-l-4 border-l-primary-500;
+}
+
+.macete-card {
+  @apply card hover-lift transition-all duration-300 hover:shadow-medium;
+}
+
+.macete-card.basico {
+  @apply border-l-4 border-l-success-500;
+}
+
+.macete-card.intermediario {
+  @apply border-l-4 border-l-warning-500;
+}
+
+.macete-card.especialista {
+  @apply border-l-4 border-l-error-500;
+}
+
+.questao-card {
+  @apply card mb-6;
+}
+
+.alternativa-item {
+  @apply flex items-start p-3 rounded-lg border border-gray-200 cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:border-gray-300;
+}
+
+.alternativa-item.selected {
+  @apply bg-primary-50 border-primary-300;
+}
+
+.alternativa-item.correct {
+  @apply bg-success-50 border-success-300;
+}
+
+.alternativa-item.incorrect {
+  @apply bg-error-50 border-error-300;
+}
+
+.navbar {
+  @apply bg-white shadow-soft border-b border-gray-200;
+}
+
+.navbar-brand {
+  @apply text-xl font-bold text-gradient;
+}
+
+.sidebar {
+  @apply bg-white shadow-soft border-r border-gray-200 h-full;
+}
+
+.loading-spinner {
+  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600;
+}
+
+/* Responsividade melhorada */
+@media (max-width: 640px) {
+  .card {
+    @apply rounded-lg;
+  }
+  
+  .card-body {
+    @apply px-4 py-3;
+  }
+  
+  .btn {
+    @apply w-full justify-center;
+  }
+  
+  .table-responsive {
+    @apply overflow-x-auto;
+  }
+}
+
+/* Dark mode support (futuro) */
+@media (prefers-color-scheme: dark) {
+  /* Estilos para dark mode serão adicionados aqui */
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    @apply hidden;
+  }
+  
+  .card {
+    @apply shadow-none border border-gray-300;
+  }
+}
