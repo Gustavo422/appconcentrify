@@ -55,3 +55,5 @@ src/static/uploads/*
 # OS
 .DS_Store
 Thumbs.db 
+
+node_modules/
