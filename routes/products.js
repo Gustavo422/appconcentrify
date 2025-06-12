@@ -1,6 +1,6 @@
 const express = require('express');
-const { supabase } = require('../config/database');
 const { requireAuth } = require('../middleware/authMiddleware');
+const ProductController = require('../src/controllers/ProductController');
 
 const router = express.Router();
 
@@ -8,85 +8,42 @@ const router = express.Router();
  * GET /products
  * Listar produtos
  */
-router.get('/', requireAuth, async (req, res) => {
-  try {
-    // Buscar produtos principais
-    const { data: mainProducts, error: mainError } = await supabase
-      .from('products')
-      .select('*')
-      .eq('is_main', true)
-      .order('order', { ascending: true });
+router.get('/', requireAuth, ProductController.index);
 
-    if (mainError) {
-      throw mainError;
-    }
+/**
+ * GET /products/create
+ * Formulário de criação (apenas admin)
+ */
+router.get('/create', requireAuth, ProductController.create);
 
-    // Buscar produtos bônus
-    const { data: bonusProducts, error: bonusError } = await supabase
-      .from('products')
-      .select('*')
-      .eq('is_main', false)
-      .order('order', { ascending: true });
-
-    if (bonusError) {
-      throw bonusError;
-    }
-
-    res.render('products/index', {
-      title: 'Produtos - Concentrify',
-      mainProducts: mainProducts || [],
-      bonusProducts: bonusProducts || []
-    });
-  } catch (error) {
-    console.error('Erro ao listar produtos:', error);
-    req.flash('error', 'Erro ao carregar produtos');
-    res.render('products/index', {
-      title: 'Produtos - Concentrify',
-      mainProducts: [],
-      bonusProducts: []
-    });
-  }
-});
+/**
+ * POST /products
+ * Criar produto (apenas admin)
+ */
+router.post('/', requireAuth, ProductController.store);
 
 /**
  * GET /products/:id
  * Visualizar produto específico
  */
-router.get('/:id', requireAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
+router.get('/:id', requireAuth, ProductController.show);
 
-    const { data: product, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
-      .single();
+/**
+ * GET /products/:id/edit
+ * Formulário de edição (apenas admin)
+ */
+router.get('/:id/edit', requireAuth, ProductController.edit);
 
-    if (error || !product) {
-      req.flash('error', 'Produto não encontrado');
-      return res.redirect('/products');
-    }
+/**
+ * PUT /products/:id
+ * Atualizar produto (apenas admin)
+ */
+router.put('/:id', requireAuth, ProductController.update);
 
-    // Redirecionar baseado no tipo de conteúdo
-    switch (product.content_type) {
-      case 'macetes':
-        return res.redirect('/macetes');
-      case 'simulados':
-        return res.redirect('/simulados');
-      case 'questoes_semanais':
-        return res.redirect('/questoes-semanais');
-      case 'pdf':
-      default:
-        return res.render('products/view-pdf', {
-          title: `${product.title} - Concentrify`,
-          product
-        });
-    }
-  } catch (error) {
-    console.error('Erro ao visualizar produto:', error);
-    req.flash('error', 'Erro ao carregar produto');
-    res.redirect('/products');
-  }
-});
+/**
+ * DELETE /products/:id
+ * Remover produto (apenas admin)
+ */
+router.delete('/:id', requireAuth, ProductController.destroy);
 
 module.exports = router;

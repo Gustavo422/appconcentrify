@@ -1,0 +1,443 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Cabeçalho -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          <i class="fas fa-lightbulb mr-2 text-warning-600"></i>
+          Gerenciar Macetes
+        </h1>
+        <p class="text-gray-600">
+          Administre os macetes do sistema
+        </p>
+      </div>
+      <a 
+        href="/macetes/admin/new" 
+        class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors duration-200"
+      >
+        <i class="fas fa-plus mr-2"></i>
+        Novo Macete
+      </a>
+    </div>
+  </div>
+
+  <!-- Estatísticas -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+            <i class="fas fa-lightbulb text-blue-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600">Total de Macetes</p>
+            <p class="text-2xl font-bold text-gray-900"><%= macetes.length %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+            <i class="fas fa-tags text-green-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600">Categorias</p>
+            <p class="text-2xl font-bold text-gray-900"><%= categorias.length %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+            <i class="fas fa-layer-group text-purple-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600">Níveis</p>
+            <p class="text-2xl font-bold text-gray-900"><%= niveis.length %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card mb-8">
+    <div class="card-header">
+      <h3 class="text-lg font-semibold text-gray-900">
+        <i class="fas fa-filter mr-2 text-primary-600"></i>
+        Filtros
+      </h3>
+    </div>
+    <div class="card-body">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label for="categoria" class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+          <select id="categoria" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Todas as categorias</option>
+            <% categorias.forEach(function(categoria) { %>
+              <option value="<%= categoria %>"><%= categoria %></option>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div>
+          <label for="nivel" class="block text-sm font-medium text-gray-700 mb-2">Nível</label>
+          <select id="nivel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Todos os níveis</option>
+            <% niveis.forEach(function(nivel) { %>
+              <option value="<%= nivel %>"><%= nivel %></option>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div class="flex items-end">
+          <button 
+            id="limparFiltros"
+            class="w-full px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md hover:bg-gray-200 transition-colors duration-200"
+          >
+            <i class="fas fa-times mr-2"></i>
+            Limpar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Macetes -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="text-lg font-semibold text-gray-900">
+        <i class="fas fa-list mr-2 text-primary-600"></i>
+        Lista de Macetes
+      </h3>
+      <!-- Botão de teste -->
+      <button 
+        onclick="testConnection()"
+        class="ml-4 px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600"
+      >
+        🧪 Testar Conexão
+      </button>
+      <button 
+        onclick="testGetRoute()"
+        class="ml-2 px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
+      >
+        🧪 Testar GET
+      </button>
+      <button 
+        onclick="testPostRoute()"
+        class="ml-2 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+      >
+        🧪 Testar POST
+      </button>
+      <button 
+        onclick="testPublicGet()"
+        class="ml-2 px-3 py-1 bg-purple-500 text-white text-sm rounded hover:bg-purple-600"
+      >
+        🧪 Testar GET Público
+      </button>
+      <button 
+        onclick="testPublicPost()"
+        class="ml-2 px-3 py-1 bg-orange-500 text-white text-sm rounded hover:bg-orange-600"
+      >
+        🧪 Testar POST Público
+      </button>
+    </div>
+    <div class="card-body">
+      <% if (macetes.length === 0) { %>
+        <div class="text-center py-12">
+          <div class="text-gray-400 mb-4">
+            <i class="fas fa-lightbulb text-6xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum macete encontrado</h3>
+          <p class="text-gray-500">Comece criando o primeiro macete.</p>
+          <a href="/macetes/admin/new" class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors duration-200">
+            <i class="fas fa-plus mr-2"></i>
+            Criar Primeiro Macete
+          </a>
+        </div>
+      <% } else { %>
+        <div class="space-y-4">
+          <% macetes.forEach(function(macete) { %>
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 macete-row" 
+                 data-categoria="<%= macete.categoria %>" 
+                 data-nivel="<%= macete.nivel %>">
+              <div class="flex items-center">
+                <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center mr-4">
+                  <i class="fas fa-lightbulb text-warning-600 text-lg"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900"><%= macete.titulo %></p>
+                  <p class="text-sm text-gray-600">
+                    <%= macete.descricao ? macete.descricao.substring(0, 80) + '...' : 'Sem descrição' %>
+                  </p>
+                  <div class="flex items-center mt-1 space-x-2">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <%= macete.categoria %>
+                    </span>
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                      <%= macete.nivel === 'Básico' ? 'bg-green-100 text-green-800' : 
+                          macete.nivel === 'Intermediário' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-red-100 text-red-800' %>">
+                      <%= macete.nivel %>
+                    </span>
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                      <%= macete.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                      <%= macete.status === 'ativo' ? 'Ativo' : 'Inativo' %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <a 
+                  href="/macetes/<%= macete.id %>/edit" 
+                  class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors duration-200"
+                  title="Editar"
+                >
+                  <i class="fas fa-edit mr-1"></i>
+                  Editar
+                </a>
+                <button 
+                  onclick="toggleMaceteStatus('<%= macete.id %>', '<%= macete.status %>')"
+                  class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200
+                    <%= macete.status === 'ativo' ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-green-600 text-white hover:bg-green-700' %>"
+                  title="<%= macete.status === 'ativo' ? 'Desativar' : 'Ativar' %>"
+                >
+                  <i class="fas fa-<%= macete.status === 'ativo' ? 'pause' : 'play' %> mr-1"></i>
+                  <%= macete.status === 'ativo' ? 'Desativar' : 'Ativar' %>
+                </button>
+                <button 
+                  onclick="deleteMacete('<%= macete.id %>')"
+                  class="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors duration-200"
+                  title="Excluir"
+                >
+                  <i class="fas fa-trash mr-1"></i>
+                  Excluir
+                </button>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+// Função de teste
+function testConnection() {
+  console.log('🧪 Teste de conexão iniciado');
+  alert('Teste iniciado! Verifique o console do navegador (F12)');
+  
+  // Teste simples de fetch
+  fetch('/macetes/admin')
+    .then(response => {
+      console.log('✅ Resposta do servidor:', response.status);
+      alert('Conexão OK! Status: ' + response.status);
+    })
+    .catch(error => {
+      console.error('❌ Erro na conexão:', error);
+      alert('Erro na conexão: ' + error.message);
+    });
+}
+
+// Teste da rota GET
+function testGetRoute() {
+  console.log('🧪 Testando rota GET /macetes/admin/test');
+  alert('Testando rota GET...');
+  
+  fetch('/macetes/admin/test')
+    .then(response => {
+      console.log('📥 Resposta GET:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('📋 Dados GET:', data);
+      alert('GET OK! ' + data.message);
+    })
+    .catch(error => {
+      console.error('❌ Erro GET:', error);
+      alert('Erro GET: ' + error.message);
+    });
+}
+
+// Teste da rota POST
+function testPostRoute() {
+  console.log('🧪 Testando rota POST /macetes/admin/test');
+  alert('Testando rota POST...');
+  
+  fetch('/macetes/admin/test', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ test: 'dados de teste' })
+  })
+  .then(response => {
+    console.log('📥 Resposta POST:', response.status);
+    return response.json();
+  })
+  .then(data => {
+    console.log('📋 Dados POST:', data);
+    alert('POST OK! ' + data.message);
+  })
+  .catch(error => {
+    console.error('❌ Erro POST:', error);
+    alert('Erro POST: ' + error.message);
+  });
+}
+
+// Teste da rota GET pública
+function testPublicGet() {
+  console.log('🧪 Testando rota GET pública /macetes/test-public');
+  alert('Testando rota GET pública...');
+  
+  fetch('/macetes/test-public')
+    .then(response => {
+      console.log('📥 Resposta GET público:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('📋 Dados GET público:', data);
+      alert('GET Público OK! ' + data.message);
+    })
+    .catch(error => {
+      console.error('❌ Erro GET público:', error);
+      alert('Erro GET público: ' + error.message);
+    });
+}
+
+// Teste da rota POST pública
+function testPublicPost() {
+  console.log('🧪 Testando rota POST pública /macetes/test-public');
+  alert('Testando rota POST pública...');
+  
+  fetch('/macetes/test-public', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ test: 'dados públicos de teste' })
+  })
+  .then(response => {
+    console.log('📥 Resposta POST público:', response.status);
+    return response.json();
+  })
+  .then(data => {
+    console.log('📋 Dados POST público:', data);
+    alert('POST Público OK! ' + data.message);
+  })
+  .catch(error => {
+    console.error('❌ Erro POST público:', error);
+    alert('Erro POST público: ' + error.message);
+  });
+}
+
+// Filtros
+document.getElementById('categoria').addEventListener('change', filterMacetes);
+document.getElementById('nivel').addEventListener('change', filterMacetes);
+document.getElementById('limparFiltros').addEventListener('click', clearFilters);
+
+function filterMacetes() {
+  const categoria = document.getElementById('categoria').value;
+  const nivel = document.getElementById('nivel').value;
+  const rows = document.querySelectorAll('.macete-row');
+  
+  rows.forEach(row => {
+    const rowCategoria = row.dataset.categoria;
+    const rowNivel = row.dataset.nivel;
+    
+    const categoriaMatch = !categoria || rowCategoria === categoria;
+    const nivelMatch = !nivel || rowNivel === nivel;
+    
+    row.style.display = categoriaMatch && nivelMatch ? 'flex' : 'none';
+  });
+}
+
+function clearFilters() {
+  document.getElementById('categoria').value = '';
+  document.getElementById('nivel').value = '';
+  filterMacetes();
+}
+
+// Ações
+function toggleMaceteStatus(id, currentStatus) {
+  console.log('🔄 Toggle status chamado - ID:', id, 'Status atual:', currentStatus);
+  alert('Toggle chamado para ID: ' + id + ' - Status: ' + currentStatus);
+  
+  const newStatus = currentStatus === 'ativo' ? 'inativo' : 'ativo';
+  const action = currentStatus === 'ativo' ? 'desativar' : 'ativar';
+  
+  if (confirm(`Tem certeza que deseja ${action} este macete?`)) {
+    console.log('📤 Enviando requisição para:', `/macetes/${id}/toggle-status`);
+    console.log('📦 Dados enviados:', { status: newStatus });
+    
+    fetch(`/macetes/${id}/toggle-status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => {
+      console.log('📥 Resposta recebida:', response.status, response.statusText);
+      return response.json();
+    })
+    .then(data => {
+      console.log('📋 Dados da resposta:', data);
+      if (data.success) {
+        console.log('✅ Sucesso - Recarregando página');
+        alert('Sucesso! Recarregando página...');
+        location.reload();
+      } else {
+        console.error('❌ Erro na resposta:', data.message);
+        alert('Erro ao atualizar status do macete: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('❌ Erro na requisição:', error);
+      alert('Erro ao atualizar status do macete: ' + error.message);
+    });
+  }
+}
+
+function deleteMacete(id) {
+  console.log('🗑️ Delete macete chamado - ID:', id);
+  alert('Delete chamado para ID: ' + id);
+  
+  if (confirm('Tem certeza que deseja excluir este macete? Esta ação não pode ser desfeita.')) {
+    console.log('📤 Enviando requisição DELETE para:', `/macetes/${id}`);
+    
+    fetch(`/macetes/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => {
+      console.log('📥 Resposta recebida:', response.status, response.statusText);
+      return response.json();
+    })
+    .then(data => {
+      console.log('📋 Dados da resposta:', data);
+      if (data.success) {
+        console.log('✅ Sucesso - Recarregando página');
+        alert('Sucesso! Recarregando página...');
+        location.reload();
+      } else {
+        console.error('❌ Erro na resposta:', data.message);
+        alert('Erro ao excluir macete: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('❌ Erro na requisição:', error);
+      alert('Erro ao excluir macete: ' + error.message);
+    });
+  }
+}
+</script> 

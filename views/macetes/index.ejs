@@ -1,0 +1,140 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Cabeçalho -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+      <i class="fas fa-lightbulb mr-2 text-warning-600"></i>
+      Macetes e Dicas
+    </h1>
+    <p class="text-gray-600">Dicas valiosas para facilitar seus estudos</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <i class="fas fa-filter mr-2 text-primary-600"></i>
+      Filtros
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+        <input type="text" 
+               id="searchInput"
+               placeholder="Buscar macetes..." 
+               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div>
+        <label for="categoriaFilter" class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+        <select id="categoriaFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="">Todas as categorias</option>
+          <% categorias.forEach(function(categoria) { %>
+            <option value="<%= categoria %>"><%= categoria %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div>
+        <label for="nivelFilter" class="block text-sm font-medium text-gray-700 mb-2">Nível</label>
+        <select id="nivelFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="">Todos os níveis</option>
+          <% niveis.forEach(function(nivel) { %>
+            <option value="<%= nivel %>"><%= nivel %></option>
+          <% }); %>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Macetes -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="text-lg font-semibold text-gray-900">
+        <i class="fas fa-lightbulb mr-2 text-warning-600"></i>
+        Macetes Disponíveis
+      </h3>
+    </div>
+    <div class="card-body">
+      <% if (macetes && macetes.length > 0) { %>
+        <div class="space-y-4">
+          <% macetes.forEach(macete => { %>
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 macete-item" 
+                 data-categoria="<%= macete.categoria %>" 
+                 data-nivel="<%= macete.nivel %>">
+              <div class="flex items-center">
+                <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center mr-4">
+                  <i class="fas fa-lightbulb text-warning-600 text-lg"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900"><%= macete.titulo %></p>
+                  <p class="text-sm text-gray-600">
+                    <%= macete.descricao ? macete.descricao.substring(0, 80) + '...' : 'Sem descrição' %>
+                  </p>
+                  <div class="flex items-center mt-1 space-x-2">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <%= macete.categoria %>
+                    </span>
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                      <%= macete.nivel === 'Básico' ? 'bg-green-100 text-green-800' : 
+                          macete.nivel === 'Intermediário' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-red-100 text-red-800' %>">
+                      <%= macete.nivel %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <a href="/macetes/<%= macete.id %>" 
+                   class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors duration-200">
+                  <i class="fas fa-eye mr-1"></i>
+                  Ver Detalhes
+                </a>
+                <span class="text-xs text-gray-500">
+                  <i class="fas fa-calendar mr-1"></i>
+                  <%= new Date(macete.created_at).toLocaleDateString('pt-BR') %>
+                </span>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="text-center py-12">
+          <div class="text-gray-400 mb-4">
+            <i class="fas fa-lightbulb text-6xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum macete encontrado</h3>
+          <p class="text-gray-500">Não há macetes disponíveis no momento.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+// Filtros
+document.getElementById('searchInput').addEventListener('input', filterMacetes);
+document.getElementById('categoriaFilter').addEventListener('change', filterMacetes);
+document.getElementById('nivelFilter').addEventListener('change', filterMacetes);
+
+function filterMacetes() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const categoria = document.getElementById('categoriaFilter').value;
+  const nivel = document.getElementById('nivelFilter').value;
+  
+  const maceteItems = document.querySelectorAll('.macete-item');
+  
+  maceteItems.forEach(item => {
+    const title = item.querySelector('.font-medium').textContent.toLowerCase();
+    const description = item.querySelector('.text-sm.text-gray-600').textContent.toLowerCase();
+    const itemCategoria = item.dataset.categoria;
+    const itemNivel = item.dataset.nivel;
+    
+    const searchMatch = !searchTerm || title.includes(searchTerm) || description.includes(searchTerm);
+    const categoriaMatch = !categoria || itemCategoria === categoria;
+    const nivelMatch = !nivel || itemNivel === nivel;
+    
+    if (searchMatch && categoriaMatch && nivelMatch) {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+</script> 

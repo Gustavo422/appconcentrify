@@ -1,17 +1,17 @@
 const express = require('express');
-const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
 const compression = require('compression');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
 const flash = require('connect-flash');
 const rateLimit = require('express-rate-limit');
+const expressLayouts = require('express-ejs-layouts');
+const methodOverride = require('method-override');
 require('dotenv').config();
 
 // Importar configurações e middlewares
-const config = require('./config/config');
+const appConfig = require('./config/app');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 const { setupSession } = require('./middleware/sessionMiddleware');
 
@@ -26,43 +26,23 @@ const questoesSemanaisRoutes = require('./routes/questoesSemanais');
 const app = express();
 
 // Configurações de segurança
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", process.env.SUPABASE_URL]
-    }
-  }
-}));
+app.use(helmet(appConfig.security.helmet));
 
 // CORS
-app.use(cors({
-  origin: config.NODE_ENV === 'production' ? config.FRONTEND_URL : true,
-  credentials: true
-}));
+app.use(cors(appConfig.security.cors));
 
 // Compressão
-app.use(compression());
+if (appConfig.compression.enabled) {
+  app.use(compression({ level: appConfig.compression.level }));
+}
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: config.RATE_LIMIT_WINDOW_MS,
-  max: config.RATE_LIMIT_MAX_REQUESTS,
-  message: {
-    error: 'Muitas tentativas. Tente novamente em alguns minutos.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
+const limiter = rateLimit(appConfig.security.rateLimit);
 app.use(limiter);
 
 // Logging
-if (config.NODE_ENV !== 'test') {
-  app.use(morgan('combined'));
+if (appConfig.logging.enabled) {
+  app.use(morgan(appConfig.logging.format));
 }
 
 // Middlewares de parsing
@@ -70,17 +50,26 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+// Method override para PUT/DELETE em formulários HTML
+app.use(methodOverride('_method'));
+
 // Configurar sessões
-setupSession(app);
+setupSession(app, appConfig.session);
 app.use(flash());
 
 // Arquivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(appConfig.staticFiles.publicPath));
+app.use('/uploads', express.static(appConfig.staticFiles.uploadsPath));
 
 // View engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', appConfig.viewEngine.engine);
+app.set('views', appConfig.viewEngine.viewsPath);
+
+// Configurar layouts
+app.use(expressLayouts);
+app.set('layout', appConfig.viewEngine.layout);
+app.set('layout extractScripts', appConfig.viewEngine.layoutExtractScripts);
+app.set('layout extractStyles', appConfig.viewEngine.layoutExtractStyles);
 
 // Middleware global para templates
 app.use((req, res, next) => {
@@ -112,13 +101,13 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Iniciar servidor
-const PORT = config.PORT || 3000;
-const HOST = config.HOST || 'localhost';
+const PORT = appConfig.port;
+const HOST = appConfig.host;
 
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Servidor rodando em http://${HOST}:${PORT}`);
-  console.log(`📊 Ambiente: ${config.NODE_ENV}`);
-  console.log(`🗄️  Banco: Supabase`);
+  console.log(`📊 Ambiente: ${appConfig.nodeEnv}`);
+  console.log('🗄️  Banco: Supabase');
 });
 
 module.exports = app;

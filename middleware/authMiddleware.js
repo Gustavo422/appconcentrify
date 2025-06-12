@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config/config');
 const { supabase } = require('../config/database');
 
 /**
@@ -41,16 +39,26 @@ const requireAuth = async (req, res, next) => {
  * Middleware para verificar se o usuário é administrador
  */
 const requireAdmin = async (req, res, next) => {
+  console.log('🔐 MIDDLEWARE ADMIN CHAMADO');
+  console.log('📋 Path:', req.path);
+  console.log('👤 Session user:', req.session.user ? 'Existe' : 'Não existe');
+  
   try {
     await requireAuth(req, res, () => {
+      console.log('✅ Usuário autenticado');
+      console.log('👑 Is admin:', req.user.is_admin);
+      
       if (!req.user.is_admin) {
+        console.log('❌ Usuário não é admin - Redirecionando');
         req.flash('error', 'Acesso restrito a administradores');
         return res.redirect('/products');
       }
+      
+      console.log('✅ Usuário é admin - Continuando');
       next();
     });
   } catch (error) {
-    console.error('Erro no middleware de admin:', error);
+    console.error('❌ Erro no middleware de admin:', error);
     res.redirect('/auth/login');
   }
 };
@@ -95,5 +103,5 @@ module.exports = {
   requireAuth,
   requireAdmin,
   requireGuest,
-  optionalAuth
+  optionalAuth,
 };

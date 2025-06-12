@@ -36,9 +36,9 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
       stats: {
         users: usersCount?.length || 0,
         products: productsCount?.length || 0,
-        simulados: simuladosCount?.length || 0
+        simulados: simuladosCount?.length || 0,
       },
-      recentUsers: recentUsers || []
+      recentUsers: recentUsers || [],
     });
   } catch (error) {
     console.error('Erro no dashboard admin:', error);
@@ -72,17 +72,17 @@ router.get('/users', requireAdmin, async (req, res) => {
       .from('users')
       .select('id', { count: 'exact' });
 
-    const totalPages = Math.ceil(totalUsers / limit);
+    const totalPages = Math.ceil((totalUsers || 0) / limit);
 
     res.render('admin/users', {
       title: 'Gerenciar Usuários - Concentrify',
       users: users || [],
       pagination: {
         currentPage: page,
-        totalPages,
+        totalPages: totalPages || 1,
         hasNext: page < totalPages,
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     });
   } catch (error) {
     console.error('Erro ao listar usuários:', error);
@@ -99,63 +99,170 @@ router.get('/users/new', requireAdmin, (req, res) => {
   res.render('admin/users/form', {
     title: 'Novo Usuário - Concentrify',
     user: null,
-    isEdit: false
+    isEdit: false,
   });
 });
 
 /**
- * POST /admin/users
- * Criar novo usuário
+ * GET /admin/users/test
+ * Formulário de teste simplificado
  */
-router.post('/users', 
+router.get('/users/test', requireAdmin, (req, res) => {
+  res.render('admin/users/form-simple', {
+    title: 'Novo Usuário - Teste',
+  });
+});
+
+/**
+ * GET /admin/users/debug
+ * Formulário de debug sem validação JavaScript
+ */
+router.get('/users/debug', requireAdmin, (req, res) => {
+  res.render('admin/users/form-debug', {
+    title: 'Debug - Novo Usuário',
+  });
+});
+
+/**
+ * GET /admin/users/new-form
+ * Novo formulário completo com visualização de senha
+ */
+router.get('/users/new-form', requireAdmin, (req, res) => {
+  res.render('admin/users/form-new', {
+    title: 'Novo Usuário - Concentrify',
+  });
+});
+
+// Funções auxiliares para criação de usuário
+const validateUserEmail = async (email) => {
+  if (!email || !email.trim()) {
+    throw new Error('Email é obrigatório');
+  }
+
+  const { data: existingUser, error: checkError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', email.toLowerCase().trim())
+    .single();
+
+  if (checkError && checkError.code !== 'PGRST116') {
+    throw new Error('Erro ao verificar email. Tente novamente.');
+  }
+
+  if (existingUser) {
+    throw new Error('Este email já está cadastrado no sistema');
+  }
+
+  return email.toLowerCase().trim();
+};
+
+const generateUserPassword = (password) => {
+  if (password && password.trim() && password.trim().length >= 6) {
+    return {
+      password: password.trim(),
+      message: 'Usuário criado com sucesso usando a senha fornecida',
+    };
+  }
+
+  const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-2);
+  return {
+    password: tempPassword,
+    message: `Usuário criado com sucesso! Senha temporária: ${tempPassword}`,
+  };
+};
+
+const createUserInDatabase = async (userData) => {
+  const { data: newUser, error: createError } = await supabase
+    .from('users')
+    .insert([userData])
+    .select()
+    .single();
+
+  if (createError) {
+    if (createError.code === '23505') {
+      throw new Error('Este email já está cadastrado no sistema');
+    } else if (createError.code === '23502') {
+      throw new Error('Dados obrigatórios não fornecidos');
+    } else {
+      throw new Error('Erro ao criar usuário. Tente novamente.');
+    }
+  }
+
+  return newUser;
+};
+
+router.post(
+  '/users',
   requireAdmin,
   validate(schemas.user),
   async (req, res) => {
     try {
-      const { email, is_admin } = req.body;
+      console.log('🔍 DEBUG - Dados recebidos:', req.body);
 
-      // Verificar se o email já existe
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', email.toLowerCase())
-        .single();
+      const { email, password, is_admin } = req.body;
 
-      if (existingUser) {
-        req.flash('error', 'Este email já está cadastrado');
-        return res.redirect('/admin/users/new');
-      }
+      console.log('📧 Email:', email);
+      console.log('🔑 Password:', password ? 'Fornecida' : 'Não fornecida');
+      console.log('👑 Is Admin:', is_admin);
 
-      // Gerar senha temporária
-      const tempPassword = Math.random().toString(36).slice(-8);
-      const passwordHash = await bcrypt.hash(tempPassword, 12);
+      // Validar email
+      const validatedEmail = await validateUserEmail(email);
+
+      // Gerar senha
+      const { password: finalPassword, message: passwordMessage } = generateUserPassword(password);
+      const passwordHash = await bcrypt.hash(finalPassword, 12);
 
       // Criar usuário
-      const { data: newUser, error } = await supabase
-        .from('users')
-        .insert([{
-          email: email.toLowerCase(),
-          password_hash: passwordHash,
-          is_admin: Boolean(is_admin),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
+      const userData = {
+        email: validatedEmail,
+        password_hash: passwordHash,
+        is_admin: Boolean(is_admin),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
 
-      if (error) {
-        throw error;
-      }
+      const newUser = await createUserInDatabase(userData);
 
-      req.flash('success', `Usuário criado com sucesso! Senha temporária: ${tempPassword}`);
+      console.log('✅ Usuário criado com sucesso:', newUser.email);
+      req.flash('success', passwordMessage);
       res.redirect('/admin/users');
     } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      req.flash('error', 'Erro ao criar usuário');
+      console.error('❌ Erro geral ao criar usuário:', error);
+      req.flash('error', error.message || 'Erro interno do servidor. Tente novamente.');
       res.redirect('/admin/users/new');
     }
-  }
+  },
 );
+
+/**
+ * GET /admin/users/:id
+ * Visualizar detalhes do usuário
+ */
+router.get('/users/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, email, is_admin, created_at, updated_at, last_login')
+      .eq('id', id)
+      .single();
+
+    if (error || !user) {
+      req.flash('error', 'Usuário não encontrado');
+      return res.redirect('/admin/users');
+    }
+
+    res.render('admin/users/view', {
+      title: 'Detalhes do Usuário - Concentrify',
+      user,
+    });
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+    req.flash('error', 'Erro ao carregar usuário');
+    res.redirect('/admin/users');
+  }
+});
 
 /**
  * GET /admin/users/:id/edit
@@ -179,7 +286,7 @@ router.get('/users/:id/edit', requireAdmin, async (req, res) => {
     res.render('admin/users/form', {
       title: 'Editar Usuário - Concentrify',
       user,
-      isEdit: true
+      isEdit: true,
     });
   } catch (error) {
     console.error('Erro ao buscar usuário:', error);
@@ -188,11 +295,53 @@ router.get('/users/:id/edit', requireAdmin, async (req, res) => {
   }
 });
 
+// Funções auxiliares para atualização de usuário
+const validateUserExists = async (id) => {
+  const { data: existingUser } = await supabase
+    .from('users')
+    .select('id, email')
+    .eq('id', id)
+    .single();
+
+  if (!existingUser) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  return existingUser;
+};
+
+const validateEmailUniqueness = async (email, userId, currentEmail) => {
+  if (email.toLowerCase() !== currentEmail) {
+    const { data: emailExists } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email.toLowerCase())
+      .neq('id', userId)
+      .single();
+
+    if (emailExists) {
+      throw new Error('Este email já está cadastrado para outro usuário');
+    }
+  }
+};
+
+const updateUserInDatabase = async (id, userData) => {
+  const { error } = await supabase
+    .from('users')
+    .update(userData)
+    .eq('id', id);
+
+  if (error) {
+    throw error;
+  }
+};
+
 /**
  * PUT /admin/users/:id
  * Atualizar usuário
  */
-router.put('/users/:id',
+router.put(
+  '/users/:id',
   requireAdmin,
   validate(schemas.user),
   async (req, res) => {
@@ -201,54 +350,28 @@ router.put('/users/:id',
       const { email, is_admin } = req.body;
 
       // Verificar se o usuário existe
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id, email')
-        .eq('id', id)
-        .single();
-
-      if (!existingUser) {
-        req.flash('error', 'Usuário não encontrado');
-        return res.redirect('/admin/users');
-      }
+      const existingUser = await validateUserExists(id);
 
       // Verificar se o email já existe (exceto para o usuário atual)
-      if (email.toLowerCase() !== existingUser.email) {
-        const { data: emailExists } = await supabase
-          .from('users')
-          .select('id')
-          .eq('email', email.toLowerCase())
-          .neq('id', id)
-          .single();
-
-        if (emailExists) {
-          req.flash('error', 'Este email já está cadastrado para outro usuário');
-          return res.redirect(`/admin/users/${id}/edit`);
-        }
-      }
+      await validateEmailUniqueness(email, id, existingUser.email);
 
       // Atualizar usuário
-      const { error } = await supabase
-        .from('users')
-        .update({
-          email: email.toLowerCase(),
-          is_admin: Boolean(is_admin),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id);
+      const userData = {
+        email: email.toLowerCase(),
+        is_admin: Boolean(is_admin),
+        updated_at: new Date().toISOString(),
+      };
 
-      if (error) {
-        throw error;
-      }
+      await updateUserInDatabase(id, userData);
 
       req.flash('success', 'Usuário atualizado com sucesso!');
       res.redirect('/admin/users');
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
-      req.flash('error', 'Erro ao atualizar usuário');
+      req.flash('error', error.message || 'Erro ao atualizar usuário');
       res.redirect(`/admin/users/${req.params.id}/edit`);
     }
-  }
+  },
 );
 
 /**
@@ -263,7 +386,7 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
     if (id === req.user.id) {
       return res.status(400).json({
         success: false,
-        error: 'Você não pode excluir seu próprio usuário'
+        error: 'Você não pode excluir seu próprio usuário',
       });
     }
 
@@ -277,15 +400,12 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'Usuário não encontrado'
+        error: 'Usuário não encontrado',
       });
     }
 
     // Excluir usuário
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('users').delete().eq('id', id);
 
     if (error) {
       throw error;
@@ -293,13 +413,13 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Usuário excluído com sucesso!'
+      message: 'Usuário excluído com sucesso!',
     });
   } catch (error) {
     console.error('Erro ao excluir usuário:', error);
     res.status(500).json({
       success: false,
-      error: 'Erro ao excluir usuário'
+      error: 'Erro ao excluir usuário',
     });
   }
 });
@@ -322,7 +442,7 @@ router.post('/users/:id/reset-password', requireAdmin, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'Usuário não encontrado'
+        error: 'Usuário não encontrado',
       });
     }
 
@@ -335,7 +455,7 @@ router.post('/users/:id/reset-password', requireAdmin, async (req, res) => {
       .from('users')
       .update({
         password_hash: passwordHash,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', id);
 
@@ -345,15 +465,30 @@ router.post('/users/:id/reset-password', requireAdmin, async (req, res) => {
 
     res.json({
       success: true,
-      message: `Senha resetada com sucesso! Nova senha: ${tempPassword}`
+      message: `Senha resetada com sucesso! Nova senha: ${tempPassword}`,
     });
   } catch (error) {
     console.error('Erro ao resetar senha:', error);
     res.status(500).json({
       success: false,
-      error: 'Erro ao resetar senha'
+      error: 'Erro ao resetar senha',
     });
   }
+});
+
+// Rota para formulário de teste funcional
+router.get('/users/form-working', (req, res) => {
+  res.render('admin/users/form-working');
+});
+
+// Rota para formulário de teste minimalista
+router.get('/users/form-test', (req, res) => {
+  res.render('admin/users/form-test');
+});
+
+// Rota para formulário de debug
+router.get('/users/form-debug', (req, res) => {
+  res.render('admin/users/form-debug');
 });
 
 module.exports = router;

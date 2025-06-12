@@ -1,0 +1,60 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">Questões Semanais</h1>
+    <p class="text-gray-600">Pratique com as questões semanais e mantenha-se atualizado!</p>
+  </div>
+
+  <% if (questoesSemanais && questoesSemanais.length > 0) { %>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <% questoesSemanais.forEach(function(questao) { %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center">
+                <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                  <span class="text-blue-600 font-semibold text-sm">Q</span>
+                </div>
+                <span class="text-sm font-medium text-gray-500">
+                  Semana <%= questao.semana_referencia %>
+                </span>
+              </div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                <%= questao.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                <%= questao.status === 'ativo' ? 'Ativo' : 'Inativo' %>
+              </span>
+            </div>
+            
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">
+              <%= questao.titulo || 'Questão Semanal' %>
+            </h3>
+            
+            <% if (questao.descricao) { %>
+              <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                <%= questao.descricao %>
+              </p>
+            <% } %>
+            
+            <div class="flex items-center justify-between">
+              <div class="text-xs text-gray-400">
+                Criado em: <%= new Date(questao.created_at).toLocaleDateString('pt-BR') %>
+              </div>
+              <a href="/questoes-semanais/<%= questao.id %>/responder" 
+                 class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition-colors duration-200">
+                Responder
+              </a>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-12">
+      <div class="text-gray-500 text-lg mb-4">
+        Nenhuma questão semanal disponível no momento
+      </div>
+      <p class="text-gray-400 text-sm">
+        Volte em breve para novas questões!
+      </p>
+    </div>
+  <% } %>
+</div> 

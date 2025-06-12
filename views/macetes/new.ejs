@@ -1,0 +1,154 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Cabeçalho -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Novo Macete
+        </h1>
+        <p class="text-gray-600">
+          Crie um novo macete para ajudar nos estudos
+        </p>
+      </div>
+      <a 
+        href="/macetes/admin" 
+        class="px-4 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition-colors duration-200"
+      >
+        <i class="fas fa-arrow-left mr-2"></i>
+        Voltar
+      </a>
+    </div>
+  </div>
+
+  <!-- Formulário -->
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <form action="/macetes/admin/new" method="POST">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Título -->
+        <div class="md:col-span-2">
+          <label for="titulo" class="block text-sm font-medium text-gray-700 mb-2">
+            Título *
+          </label>
+          <input 
+            type="text" 
+            id="titulo" 
+            name="titulo" 
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ex: Técnica Pomodoro"
+          >
+        </div>
+
+        <!-- Descrição -->
+        <div class="md:col-span-2">
+          <label for="descricao" class="block text-sm font-medium text-gray-700 mb-2">
+            Descrição
+          </label>
+          <textarea 
+            id="descricao" 
+            name="descricao" 
+            rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Breve descrição do macete"
+          ></textarea>
+        </div>
+
+        <!-- Categoria -->
+        <div>
+          <label for="categoria" class="block text-sm font-medium text-gray-700 mb-2">
+            Categoria *
+          </label>
+          <select 
+            id="categoria" 
+            name="categoria" 
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Selecione uma categoria</option>
+            <% categorias.forEach(function(categoria) { %>
+              <option value="<%= categoria %>"><%= categoria %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Nível -->
+        <div>
+          <label for="nivel" class="block text-sm font-medium text-gray-700 mb-2">
+            Nível *
+          </label>
+          <select 
+            id="nivel" 
+            name="nivel" 
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Selecione um nível</option>
+            <% niveis.forEach(function(nivel) { %>
+              <option value="<%= nivel %>"><%= nivel %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Conteúdo -->
+        <div class="md:col-span-2">
+          <label for="conteudo" class="block text-sm font-medium text-gray-700 mb-2">
+            Conteúdo *
+          </label>
+          <textarea 
+            id="conteudo" 
+            name="conteudo" 
+            required
+            rows="6"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Explique detalhadamente o macete..."
+          ></textarea>
+        </div>
+
+        <!-- Exemplos -->
+        <div class="md:col-span-2">
+          <label for="exemplos" class="block text-sm font-medium text-gray-700 mb-2">
+            Exemplos
+          </label>
+          <textarea 
+            id="exemplos" 
+            name="exemplos" 
+            rows="4"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Forneça exemplos práticos..."
+          ></textarea>
+        </div>
+
+        <!-- Dicas -->
+        <div class="md:col-span-2">
+          <label for="dicas" class="block text-sm font-medium text-gray-700 mb-2">
+            Dicas Adicionais
+          </label>
+          <textarea 
+            id="dicas" 
+            name="dicas" 
+            rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Dicas extras para aplicar o macete..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Botões -->
+      <div class="flex justify-end space-x-4 mt-8">
+        <a 
+          href="/macetes/admin" 
+          class="px-6 py-2 bg-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-400 transition-colors duration-200"
+        >
+          Cancelar
+        </a>
+        <button 
+          type="submit" 
+          class="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors duration-200"
+        >
+          <i class="fas fa-save mr-2"></i>
+          Criar Macete
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

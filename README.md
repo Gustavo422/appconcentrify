@@ -1,73 +1,102 @@
-# Concentrify WebApp - Node.js
+# Concentrify WebApp
 
-> Aplicação web moderna para gerenciamento de conteúdo educacional, simulados e macetes para concursos públicos.
+Uma aplicação web moderna para gerenciamento de conteúdo educacional, simulados e macetes para concursos, construída com Node.js, Express, EJS e Tailwind CSS.
+
+## 🏗️ Arquitetura
+
+O projeto segue os **princípios SOLID** e padrões de desenvolvimento modernos:
+
+### 📁 Estrutura de Pastas
+
+```
+concentrify-webapp/
+├── src/                          # Código fonte principal
+│   ├── controllers/              # Controladores (Single Responsibility)
+│   ├── services/                 # Lógica de negócio
+│   ├── models/                   # Modelos de dados
+│   ├── validators/               # Validações específicas
+│   ├── utils/                    # Utilitários e helpers
+│   └── constants/                # Constantes centralizadas
+├── routes/                       # Definição de rotas
+├── middleware/                   # Middlewares customizados
+├── config/                       # Configurações
+├── views/                        # Templates EJS
+├── public/                       # Arquivos estáticos
+└── uploads/                      # Uploads de arquivos
+```
+
+### 🎯 Princípios SOLID Aplicados
+
+#### 1. **Single Responsibility Principle (SRP)**
+
+- Cada controller tem uma única responsabilidade
+- Services separados para lógica de negócio
+- Validators específicos para cada entidade
+
+#### 2. **Open/Closed Principle (OCP)**
+
+- Middlewares extensíveis
+- Configurações centralizadas
+- Estrutura modular
+
+#### 3. **Liskov Substitution Principle (LSP)**
+
+- Interfaces consistentes entre services
+- Padrões de resposta padronizados
+
+#### 4. **Interface Segregation Principle (ISP)**
+
+- Validators específicos por domínio
+- Utilitários especializados
+
+#### 5. **Dependency Inversion Principle (DIP)**
+
+- Injeção de dependências nos controllers
+- Configurações centralizadas
 
 ## 🚀 Tecnologias
 
-- **Backend**: Node.js + Express.js
-- **Banco de Dados**: Supabase (PostgreSQL)
-- **Autenticação**: JWT + Sessions
-- **Frontend**: EJS + TailwindCSS
-- **Segurança**: Helmet, Rate Limiting, CORS
-- **Validação**: Joi
-- **Upload**: Multer
+- **Backend**: Node.js, Express.js
+- **View Engine**: EJS com layouts
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Session-based com bcrypt
+- **Validation**: Joi
+- **Security**: Helmet, CORS, Rate Limiting
 
-## 📋 Pré-requisitos
+## 📦 Instalação
 
-- Node.js 18+ 
-- Conta no [Supabase](https://supabase.com)
-- Git
-
-## 🔧 Instalação
-
-### 1. Clone o repositório
+1. **Clone o repositório**
 
 ```bash
-git clone https://github.com/seu-usuario/concentrify-webapp.git
+git clone <repository-url>
 cd concentrify-webapp
 ```
 
-### 2. Instale as dependências
+2. **Instale as dependências**
 
 ```bash
 npm install
 ```
 
-### 3. Configure as variáveis de ambiente
+3. **Configure as variáveis de ambiente**
 
 ```bash
 cp .env.example .env
 ```
 
-Edite o arquivo `.env` com suas configurações:
+4. **Configure o Supabase**
 
-```env
-# Configurações do Servidor
-NODE_ENV=development
-PORT=3000
-HOST=localhost
+- Crie um projeto no Supabase
+- Configure as variáveis de ambiente com suas credenciais
 
-# Configurações de Segurança
-JWT_SECRET=seu-jwt-secret-super-seguro-aqui
-SESSION_SECRET=seu-session-secret-super-seguro-aqui
-
-# Configurações do Supabase
-SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_ANON_KEY=sua-chave-anonima-aqui
-SUPABASE_SERVICE_ROLE_KEY=sua-chave-service-role-aqui
-```
-
-### 4. Configure o Supabase
-
-1. Crie um novo projeto no [Supabase](https://supabase.com)
-2. Copie a URL e as chaves do projeto
-3. Execute as migrações:
+5. **Execute as migrações**
 
 ```bash
-npm run setup
+npm run migrate
 ```
 
-### 5. Inicie a aplicação
+6. **Inicie o servidor**
 
 ```bash
 # Desenvolvimento
@@ -77,149 +106,148 @@ npm run dev
 npm start
 ```
 
-A aplicação estará disponível em `http://localhost:3000`
+## 🔧 Scripts Disponíveis
 
-## 🗄️ Estrutura do Banco de Dados
+```json
+{
+  "start": "node server.js",
+  "dev": "nodemon server.js",
+  "build": "npm run build:css",
+  "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
+  "setup": "node scripts/setup.js",
+  "migrate": "node scripts/migrate.js",
+  "seed": "node scripts/seed.js"
+}
+```
+
+## 🏛️ Estrutura de Código
+
+### Controllers
+
+```javascript
+// src/controllers/AuthController.js
+class AuthController {
+  constructor() {
+    this.authService = new AuthService(); // Dependency Injection
+  }
+
+  async login(req, res) {
+    // Lógica de controller
+  }
+}
+```
+
+### Services
+
+```javascript
+// src/services/AuthService.js
+class AuthService {
+  async login(email, password) {
+    // Lógica de negócio
+  }
+}
+```
+
+### Validators
+
+```javascript
+// src/validators/authValidators.js
+function validateLogin(data) {
+  // Validação específica
+}
+```
+
+### Utilitários
+
+```javascript
+// src/utils/responseHelper.js
+function sendSuccess(res, statusCode, message, data) {
+  // Resposta padronizada
+}
+```
+
+## 🔐 Autenticação
+
+O sistema utiliza autenticação baseada em sessões com:
+
+- **Login/Logout** para usuários
+- **Registro** apenas para administradores
+- **Rate limiting** para prevenir ataques
+- **Validação** de dados de entrada
+- **Hash** de senhas com bcrypt
+
+## 🛡️ Segurança
+
+- **Helmet** para headers de segurança
+- **CORS** configurado
+- **Rate Limiting** para prevenir abuso
+- **Validação** de entrada com Joi
+- **Sanitização** de dados
+- **Sessões seguras**
+
+## 📊 Banco de Dados
 
 ### Tabelas Principais
 
-- **users**: Usuários do sistema
-- **products**: Produtos educacionais
-- **simulados**: Simulados e questões
-- **macetes**: Macetes de memorização
-- **questoes_semanais**: Questões semanais
+- `users` - Usuários do sistema
+- `products` - Produtos/cursos
+- `simulados` - Simulados disponíveis
+- `questoes_semanais` - Questões semanais
+- `macetes` - Macetes e dicas
 
-### Migrações
+## 🎨 Frontend
 
-As migrações são executadas automaticamente com o comando `npm run setup`. Elas criam:
+- **Tailwind CSS** para estilização
+- **EJS** como template engine
+- **Layouts responsivos**
+- **Componentes reutilizáveis**
 
-- Todas as tabelas necessárias
-- Índices para performance
-- Políticas RLS (Row Level Security)
-- Triggers para campos de timestamp
-- Usuário administrador inicial
+## 🔄 Padrões de Desenvolvimento
 
-## 👤 Credenciais Padrão
+### 1. **DRY (Don't Repeat Yourself)**
 
-Após a configuração inicial:
+- Utilitários centralizados
+- Helpers reutilizáveis
+- Constantes compartilhadas
 
-- **Email**: admin@concentrify.com
-- **Senha**: admin123
+### 2. **Clean Code**
 
-⚠️ **IMPORTANTE**: Altere a senha após o primeiro login!
+- Nomes descritivos
+- Funções pequenas e focadas
+- Comentários JSDoc
 
-## 🏗️ Estrutura do Projeto
+### 3. **Error Handling**
 
-```
-concentrify-webapp/
-├── config/                 # Configurações
-│   ├── config.js          # Configurações gerais
-│   └── database.js        # Configuração do Supabase
-├── middleware/             # Middlewares
-│   ├── authMiddleware.js  # Autenticação
-│   ├── errorMiddleware.js # Tratamento de erros
-│   ├── sessionMiddleware.js # Sessões
-│   └── validationMiddleware.js # Validação
-├── routes/                 # Rotas da aplicação
-│   ├── auth.js            # Autenticação
-│   ├── admin.js           # Administração
-│   ├── products.js        # Produtos
-│   ├── simulados.js       # Simulados
-│   ├── macetes.js         # Macetes
-│   └── questoesSemanais.js # Questões semanais
-├── views/                  # Templates EJS
-│   ├── layouts/           # Layouts base
-│   ├── auth/              # Páginas de autenticação
-│   ├── admin/             # Páginas administrativas
-│   ├── products/          # Páginas de produtos
-│   └── errors/            # Páginas de erro
-├── public/                 # Arquivos estáticos
-│   ├── css/               # Estilos CSS
-│   ├── js/                # JavaScript
-│   └── images/            # Imagens
-├── scripts/               # Scripts utilitários
-│   ├── setup.js           # Configuração inicial
-│   ├── migrate.js         # Migrações
-│   └── seed.js            # Dados iniciais
-├── migrations/            # Migrações SQL
-├── uploads/               # Arquivos enviados
-└── server.js              # Servidor principal
-```
+- Middleware de erro centralizado
+- Respostas padronizadas
+- Logging estruturado
 
-## 🔐 Segurança
+### 4. **Validation**
 
-### Implementações de Segurança
+- Validação em camadas
+- Schemas específicos
+- Mensagens de erro claras
 
-- **Helmet**: Proteção de cabeçalhos HTTP
-- **Rate Limiting**: Limitação de requisições
-- **CORS**: Controle de origem cruzada
-- **Sessions**: Sessões seguras com cookies
-- **JWT**: Tokens para autenticação
-- **Bcrypt**: Hash de senhas
-- **Joi**: Validação de dados
-- **RLS**: Row Level Security no Supabase
+## 📝 API Endpoints
 
-### Boas Práticas
+### Autenticação
 
-- Senhas com hash bcrypt (12 rounds)
-- Sessões com expiração automática
-- Validação rigorosa de entrada
-- Sanitização de dados
-- Logs de segurança
-- Políticas de acesso granulares
+- `GET /auth/login` - Página de login
+- `POST /auth/login` - Processar login
+- `POST /auth/logout` - Logout
 
-## 🎨 Interface
+### Produtos
 
-### Design System
+- `GET /products` - Listar produtos
+- `GET /products/:id` - Ver produto
+- `POST /products` - Criar produto (admin)
+- `PUT /products/:id` - Atualizar produto (admin)
+- `DELETE /products/:id` - Remover produto (admin)
 
-- **Framework**: TailwindCSS
-- **Componentes**: Sistema modular
-- **Responsividade**: Mobile-first
-- **Acessibilidade**: WCAG 2.1
-- **Paleta**: Material Design inspirada
+### Admin
 
-### Características
-
-- Interface moderna e intuitiva
-- Animações suaves
-- Feedback visual claro
-- Navegação consistente
-- Otimizada para performance
-
-## 📱 Funcionalidades
-
-### Para Usuários
-
-- ✅ Login seguro
-- ✅ Visualização de produtos
-- ✅ Acesso a simulados
-- ✅ Consulta de macetes
-- ✅ Questões semanais
-- ✅ Histórico de atividades
-
-### Para Administradores
-
-- ✅ Dashboard completo
-- ✅ Gerenciamento de usuários
-- ✅ Controle de produtos
-- ✅ Administração de simulados
-- ✅ Gestão de macetes
-- ✅ Configuração de questões semanais
-
-## 🚀 Deploy
-
-### Vercel (Recomendado)
-
-1. Conecte seu repositório ao Vercel
-2. Configure as variáveis de ambiente
-3. Deploy automático
-
-### Outras Plataformas
-
-- **Heroku**: Suporte nativo ao Node.js
-- **Railway**: Deploy simples
-- **DigitalOcean**: App Platform
-- **AWS**: Elastic Beanstalk
+- `GET /admin/dashboard` - Dashboard administrativo
+- `GET /admin/users` - Gerenciar usuários
 
 ## 🧪 Testes
 
@@ -227,127 +255,58 @@ concentrify-webapp/
 # Executar testes
 npm test
 
-# Testes com coverage
+# Cobertura de código
 npm run test:coverage
-
-# Testes em modo watch
-npm run test:watch
 ```
 
-## 📊 Monitoramento
+## 📈 Monitoramento
 
-### Logs
+- **Morgan** para logging de requisições
+- **Error tracking** centralizado
+- **Performance monitoring**
 
-- Logs estruturados com Winston
-- Níveis: error, warn, info, debug
-- Rotação automática de arquivos
-- Integração com serviços externos
+## 🚀 Deploy
 
-### Métricas
+### Variáveis de Ambiente Necessárias
 
-- Performance de rotas
-- Uso de memória
-- Conexões de banco
-- Taxa de erro
+```env
+NODE_ENV=production
+PORT=3000
+SUPABASE_URL=your-supabase-url
+SUPABASE_ANON_KEY=your-supabase-key
+SESSION_SECRET=your-session-secret
+```
 
-## 🔄 Scripts Disponíveis
+### Comandos de Deploy
 
 ```bash
-# Desenvolvimento
-npm run dev          # Inicia com nodemon
-npm run build        # Build do CSS
-npm run build:css    # Build do TailwindCSS
+# Build da aplicação
+npm run build
 
-# Produção
-npm start            # Inicia servidor
-npm run setup        # Configuração inicial
-npm run migrate      # Executar migrações
-npm run seed         # Dados iniciais
-
-# Utilitários
-npm run lint         # Verificar código
-npm run format       # Formatar código
-npm run clean        # Limpar cache
+# Iniciar em produção
+npm start
 ```
 
 ## 🤝 Contribuição
 
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
-
-### Padrões de Código
-
-- ESLint para JavaScript
-- Prettier para formatação
-- Conventional Commits
-- Testes obrigatórios para novas features
-
-## 📝 Changelog
-
-### v1.0.0 (2024-01-01)
-
-- ✨ Migração completa para Node.js
-- ✨ Integração com Supabase
-- ✨ Interface redesenhada com TailwindCSS
-- ✨ Sistema de autenticação robusto
-- ✨ Painel administrativo melhorado
-- ✨ Validação de dados aprimorada
-- ✨ Segurança reforçada
-- ✨ Performance otimizada
-
-## 🐛 Problemas Conhecidos
-
-- [ ] Upload de arquivos grandes pode ser lento
-- [ ] Cache de imagens precisa ser implementado
-- [ ] Notificações em tempo real pendentes
-
-## 🔮 Roadmap
-
-### v1.1.0
-- [ ] Sistema de notificações
-- [ ] API REST completa
-- [ ] Modo offline
-- [ ] PWA support
-
-### v1.2.0
-- [ ] Chat em tempo real
-- [ ] Gamificação
-- [ ] Relatórios avançados
-- [ ] Integração com calendário
-
-### v2.0.0
-- [ ] Mobile app (React Native)
-- [ ] IA para recomendações
-- [ ] Análise de performance
-- [ ] Marketplace de conteúdo
 
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
+## 👥 Equipe
+
+- **Concentrify Team** - Desenvolvimento e manutenção
+
 ## 📞 Suporte
 
-- **Email**: suporte@concentrify.com
-- **Discord**: [Servidor da Comunidade](https://discord.gg/concentrify)
-- **Documentação**: [docs.concentrify.com](https://docs.concentrify.com)
-
-## 🙏 Agradecimentos
-
-- [Supabase](https://supabase.com) - Backend as a Service
-- [TailwindCSS](https://tailwindcss.com) - Framework CSS
-- [Express.js](https://expressjs.com) - Framework Node.js
-- [Font Awesome](https://fontawesome.com) - Ícones
+Para suporte, envie um email para suporte@concentrify.com ou abra uma issue no GitHub.
 
 ---
 
-<div align="center">
-  <p>Feito com ❤️ pela equipe Concentrify</p>
-  <p>
-    <a href="https://concentrify.com">Website</a> •
-    <a href="https://docs.concentrify.com">Documentação</a> •
-    <a href="https://github.com/concentrify/webapp/issues">Reportar Bug</a>
-  </p>
-</div>
+**Concentrify** - Transformando a preparação para concursos! 🎯

@@ -22,14 +22,14 @@ router.get('/', requireAuth, async (req, res) => {
 
     res.render('simulados/index', {
       title: 'Simulados - Concentrify',
-      simulados: simulados || []
+      simulados: simulados || [],
     });
   } catch (error) {
     console.error('Erro ao listar simulados:', error);
     req.flash('error', 'Erro ao carregar simulados');
     res.render('simulados/index', {
       title: 'Simulados - Concentrify',
-      simulados: []
+      simulados: [],
     });
   }
 });
@@ -40,18 +40,36 @@ router.get('/', requireAuth, async (req, res) => {
  */
 router.get('/admin', requireAdmin, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 20;
+    const offset = (page - 1) * limit;
+
     const { data: simulados, error } = await supabase
       .from('simulados')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (error) {
       throw error;
     }
 
+    // Contar total de simulados
+    const { count: totalSimulados } = await supabase
+      .from('simulados')
+      .select('id', { count: 'exact' });
+
+    const totalPages = Math.ceil(totalSimulados / limit);
+
     res.render('simulados/admin', {
       title: 'Gerenciar Simulados - Concentrify',
-      simulados: simulados || []
+      simulados: simulados || [],
+      pagination: {
+        currentPage: page,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
     });
   } catch (error) {
     console.error('Erro ao carregar admin de simulados:', error);
@@ -81,7 +99,7 @@ router.get('/:id', requireAuth, async (req, res) => {
 
     res.render('simulados/view', {
       title: `${simulado.titulo} - Concentrify`,
-      simulado
+      simulado,
     });
   } catch (error) {
     console.error('Erro ao visualizar simulado:', error);

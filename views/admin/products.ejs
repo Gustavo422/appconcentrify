@@ -1,0 +1,204 @@
+<%- include('../layouts/main') %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Gerenciar Produtos</h1>
+        <p class="text-gray-600">Gerencie todos os produtos educacionais</p>
+      </div>
+      <a href="/admin/products/new" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+        <i class="fas fa-plus mr-2"></i>
+        Novo Produto
+      </a>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div class="flex flex-wrap gap-4">
+      <div class="flex-1 min-w-0">
+        <input type="text" 
+               placeholder="Buscar produtos..." 
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+               id="searchInput">
+      </div>
+      <select class="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <option value="">Todos os tipos</option>
+        <option value="pdf">PDF</option>
+        <option value="video">Vídeo</option>
+        <option value="text">Texto</option>
+      </select>
+      <select class="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <option value="">Todos os status</option>
+        <option value="ativo">Ativo</option>
+        <option value="inativo">Inativo</option>
+        <option value="rascunho">Rascunho</option>
+      </select>
+      <button class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+        <i class="fas fa-search mr-2"></i>
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Produtos -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% if (products && products.length > 0) { %>
+      <% products.forEach(product => { %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <!-- Imagem do Produto -->
+          <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <% if (product.cover_image) { %>
+              <img src="<%= product.cover_image %>" 
+                   alt="<%= product.title %>" 
+                   class="w-full h-full object-cover">
+            <% } else { %>
+              <div class="text-gray-400">
+                <i class="fas fa-file-pdf text-4xl"></i>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Conteúdo do Produto -->
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <%= product.content_type %>
+              </span>
+              <% if (product.is_main) { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Principal
+                </span>
+              <% } %>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">
+              <%= product.title %>
+            </h3>
+
+            <% if (product.description) { %>
+              <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                <%= product.description %>
+              </p>
+            <% } %>
+
+            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+              <span>
+                <i class="fas fa-calendar mr-1"></i>
+                <%= new Date(product.created_at).toLocaleDateString('pt-BR') %>
+              </span>
+              <% if (product.views) { %>
+                <span>
+                  <i class="fas fa-eye mr-1"></i>
+                  <%= product.views %> visualizações
+                </span>
+              <% } %>
+            </div>
+
+            <!-- Ações -->
+            <div class="flex space-x-2">
+              <a href="/admin/products/<%= product.id %>/edit" 
+                 class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
+                <i class="fas fa-edit mr-1"></i>
+                Editar
+              </a>
+              
+              <a href="/admin/products/<%= product.id %>" 
+                 class="inline-flex items-center px-3 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors">
+                <i class="fas fa-eye"></i>
+              </a>
+              
+              <button onclick="deleteProduct(<%= product.id %>)" 
+                      class="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-span-full text-center py-12">
+        <div class="text-gray-400 mb-4">
+          <i class="fas fa-book-open text-6xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum produto encontrado</h3>
+        <p class="text-gray-500">Não há produtos cadastrados no sistema.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Paginação -->
+  <% if (totalPages > 1) { %>
+    <div class="mt-8 flex justify-center">
+      <nav class="flex items-center space-x-2">
+        <% if (currentPage > 1) { %>
+          <a href="?page=<%= currentPage - 1 %>" 
+             class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            Anterior
+          </a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
+              <%= i %>
+            </span>
+          <% } else { %>
+            <a href="?page=<%= i %>" 
+               class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+              <%= i %>
+            </a>
+          <% } %>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="?page=<%= currentPage + 1 %>" 
+             class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            Próxima
+          </a>
+        <% } %>
+      </nav>
+    </div>
+  <% } %>
+</div>
+
+<script>
+function deleteProduct(productId) {
+  if (confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) {
+    fetch(`/admin/products/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert('Erro ao excluir produto');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Erro ao excluir produto');
+    });
+  }
+}
+
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  const searchTerm = e.target.value.toLowerCase();
+  const productCards = document.querySelectorAll('.product-card');
+  
+  productCards.forEach(card => {
+    const title = card.querySelector('h3').textContent.toLowerCase();
+    const description = card.querySelector('p')?.textContent.toLowerCase() || '';
+    
+    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+});
+</script> 

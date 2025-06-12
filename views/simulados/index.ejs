@@ -1,0 +1,172 @@
+<%- include('../layouts/main') %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Simulados</h1>
+    <p class="text-gray-600">Teste seus conhecimentos com nossos simulados</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div class="flex flex-wrap gap-4">
+      <div class="flex-1 min-w-0">
+        <input type="text" 
+               placeholder="Buscar simulados..." 
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+               id="searchInput">
+      </div>
+      <select class="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <option value="">Todas as matérias</option>
+        <option value="portugues">Português</option>
+        <option value="matematica">Matemática</option>
+        <option value="direito">Direito</option>
+        <option value="administrativo">Administrativo</option>
+      </select>
+      <button class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+        <i class="fas fa-search mr-2"></i>
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Simulados -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% if (simulados && simulados.length > 0) { %>
+      <% simulados.forEach(simulado => { %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <!-- Header do Simulado -->
+          <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white bg-opacity-20">
+                <%= simulado.total_questoes %> questões
+              </span>
+              <% if (simulado.status === 'ativo') { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500 bg-opacity-20">
+                  Ativo
+                </span>
+              <% } else { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500 bg-opacity-20">
+                  Inativo
+                </span>
+              <% } %>
+            </div>
+            <h3 class="text-xl font-semibold mb-2"><%= simulado.titulo %></h3>
+            <% if (simulado.materias) { %>
+              <p class="text-sm opacity-90"><%= simulado.materias %></p>
+            <% } %>
+          </div>
+
+          <!-- Conteúdo do Simulado -->
+          <div class="p-6">
+            <% if (simulado.descricao) { %>
+              <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                <%= simulado.descricao %>
+              </p>
+            <% } %>
+
+            <div class="space-y-3 mb-6">
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-clock mr-2"></i>
+                <span>Tempo estimado: <%= simulado.tempo_estimado || 'Não definido' %></span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-calendar mr-2"></i>
+                <span>Criado em: <%= new Date(simulado.created_at).toLocaleDateString('pt-BR') %></span>
+              </div>
+              <% if (simulado.ultima_tentativa) { %>
+                <div class="flex items-center text-sm text-gray-600">
+                  <i class="fas fa-history mr-2"></i>
+                  <span>Última tentativa: <%= new Date(simulado.ultima_tentativa).toLocaleDateString('pt-BR') %></span>
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Ações -->
+            <div class="flex space-x-2">
+              <% if (simulado.status === 'ativo') { %>
+                <a href="/simulados/<%= simulado.id %>/iniciar" 
+                   class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                  <i class="fas fa-play mr-2"></i>
+                  Iniciar
+                </a>
+              <% } %>
+              
+              <a href="/simulados/<%= simulado.id %>" 
+                 class="inline-flex items-center px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                <i class="fas fa-info-circle"></i>
+              </a>
+              
+              <% if (simulado.ultima_tentativa) { %>
+                <a href="/simulados/<%= simulado.id %>/resultado" 
+                   class="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                  <i class="fas fa-chart-bar"></i>
+                </a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-span-full text-center py-12">
+        <div class="text-gray-400 mb-4">
+          <i class="fas fa-clipboard-list text-6xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum simulado encontrado</h3>
+        <p class="text-gray-500">Não há simulados disponíveis no momento.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Paginação -->
+  <% if (totalPages > 1) { %>
+    <div class="mt-8 flex justify-center">
+      <nav class="flex items-center space-x-2">
+        <% if (currentPage > 1) { %>
+          <a href="?page=<%= currentPage - 1 %>" 
+             class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            Anterior
+          </a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
+              <%= i %>
+            </span>
+          <% } else { %>
+            <a href="?page=<%= i %>" 
+               class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+              <%= i %>
+            </a>
+          <% } %>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="?page=<%= currentPage + 1 %>" 
+             class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            Próxima
+          </a>
+        <% } %>
+      </nav>
+    </div>
+  <% } %>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  const searchTerm = e.target.value.toLowerCase();
+  const simuladoCards = document.querySelectorAll('.simulado-card');
+  
+  simuladoCards.forEach(card => {
+    const title = card.querySelector('h3').textContent.toLowerCase();
+    const description = card.querySelector('p')?.textContent.toLowerCase() || '';
+    const materias = card.querySelector('.materias')?.textContent.toLowerCase() || '';
+    
+    if (title.includes(searchTerm) || description.includes(searchTerm) || materias.includes(searchTerm)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+});
+</script> 

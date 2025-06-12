@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Formulário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos específicos para debug */
+        .debug-button {
+            background-color: #2563eb !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 6px !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            border: none !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        .debug-button:hover {
+            background-color: #1d4ed8 !important;
+        }
+        .debug-button:disabled {
+            background-color: #9ca3af !important;
+            cursor: not-allowed !important;
+        }
+        .password-toggle-debug {
+            position: absolute !important;
+            right: 10px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            color: #6b7280 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            display: block !important;
+        }
+        .password-toggle-debug:hover {
+            color: #374151 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Debug Formulário</h1>
+            
+            <!-- Status dos elementos -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <h3 class="text-sm font-medium text-yellow-800 mb-2">Status dos Elementos:</h3>
+                <div id="elementStatus" class="text-sm text-yellow-700">
+                    Verificando...
+                </div>
+            </div>
+            
+            <!-- Formulário -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <form id="debugForm" method="POST" action="/admin/users">
+                    
+                    <!-- Email -->
+                    <div class="mb-6">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email *
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="usuario@exemplo.com"
+                        >
+                    </div>
+
+                    <!-- Senha -->
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                            Senha
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                minlength="6"
+                                class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md"
+                                placeholder="Deixe em branco para gerar senha automática"
+                            >
+                            <button 
+                                type="button"
+                                id="togglePassword"
+                                class="password-toggle-debug"
+                                onclick="togglePasswordDebug()"
+                            >
+                                <i class="fas fa-eye" id="passwordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar Senha -->
+                    <div class="mb-6">
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                            Confirmar Senha
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                name="confirmPassword" 
+                                minlength="6"
+                                class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md"
+                                placeholder="Confirme a senha"
+                            >
+                            <button 
+                                type="button"
+                                id="toggleConfirmPassword"
+                                class="password-toggle-debug"
+                                onclick="toggleConfirmPasswordDebug()"
+                            >
+                                <i class="fas fa-eye" id="confirmPasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Admin -->
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                name="is_admin" 
+                                value="1"
+                                class="h-4 w-4 text-blue-600"
+                            >
+                            <span class="ml-2 text-sm text-gray-700">
+                                Usuário administrador
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                        <a 
+                            href="/admin/users" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                        >
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Voltar
+                        </a>
+                        
+                        <button 
+                            type="submit"
+                            id="submitBtn"
+                            class="debug-button"
+                            onclick="submitFormDebug(event)"
+                        >
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Criar Usuário
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Log de eventos -->
+            <div class="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-gray-800 mb-2">Log de Eventos:</h3>
+                <div id="eventLog" class="text-sm text-gray-700 max-h-40 overflow-y-auto">
+                    Aguardando eventos...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logEvent(message) {
+            const eventLog = document.getElementById('eventLog');
+            const time = new Date().toLocaleTimeString();
+            eventLog.innerHTML += `<br>[${time}] ${message}`;
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        function checkElementStatus() {
+            const submitBtn = document.getElementById('submitBtn');
+            const togglePassword = document.getElementById('togglePassword');
+            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+            
+            const status = document.getElementById('elementStatus');
+            
+            const submitVisible = submitBtn.offsetParent !== null;
+            const submitDisplay = window.getComputedStyle(submitBtn).display;
+            const submitVisibility = window.getComputedStyle(submitBtn).visibility;
+            const submitOpacity = window.getComputedStyle(submitBtn).opacity;
+            
+            const toggle1Visible = togglePassword.offsetParent !== null;
+            const toggle1Display = window.getComputedStyle(togglePassword).display;
+            const toggle1Visibility = window.getComputedStyle(togglePassword).visibility;
+            
+            const toggle2Visible = toggleConfirmPassword.offsetParent !== null;
+            const toggle2Display = window.getComputedStyle(toggleConfirmPassword).display;
+            const toggle2Visibility = window.getComputedStyle(toggleConfirmPassword).visibility;
+            
+            status.innerHTML = `
+                <strong>Botão Submit:</strong><br>
+                - Visível: ${submitVisible}<br>
+                - Display: ${submitDisplay}<br>
+                - Visibility: ${submitVisibility}<br>
+                - Opacity: ${submitOpacity}<br><br>
+                
+                <strong>Toggle Senha:</strong><br>
+                - Visível: ${toggle1Visible}<br>
+                - Display: ${toggle1Display}<br>
+                - Visibility: ${toggle1Visibility}<br><br>
+                
+                <strong>Toggle Confirmação:</strong><br>
+                - Visível: ${toggle2Visible}<br>
+                - Display: ${toggle2Display}<br>
+                - Visibility: ${toggle2Visibility}
+            `;
+        }
+
+        function togglePasswordDebug() {
+            const password = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                passwordIcon.className = 'fas fa-eye-slash';
+                logEvent('Senha: VISÍVEL');
+            } else {
+                password.type = 'password';
+                passwordIcon.className = 'fas fa-eye';
+                logEvent('Senha: OCULTA');
+            }
+        }
+
+        function toggleConfirmPasswordDebug() {
+            const confirmPassword = document.getElementById('confirmPassword');
+            const confirmPasswordIcon = document.getElementById('confirmPasswordIcon');
+            
+            if (confirmPassword.type === 'password') {
+                confirmPassword.type = 'text';
+                confirmPasswordIcon.className = 'fas fa-eye-slash';
+                logEvent('Confirmação: VISÍVEL');
+            } else {
+                confirmPassword.type = 'password';
+                confirmPasswordIcon.className = 'fas fa-eye';
+                logEvent('Confirmação: OCULTA');
+            }
+        }
+
+        function submitFormDebug(event) {
+            event.preventDefault();
+            logEvent('Formulário submetido!');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            logEvent(`Email: ${email}`);
+            logEvent(`Senha: ${password ? '***' : 'vazia'}`);
+            logEvent(`Confirmação: ${confirmPassword ? '***' : 'vazia'}`);
+            
+            // Validar
+            if (!email) {
+                alert('Email é obrigatório!');
+                logEvent('ERRO: Email obrigatório');
+                return;
+            }
+            
+            if (password && password.length < 6) {
+                alert('Senha deve ter pelo menos 6 caracteres!');
+                logEvent('ERRO: Senha muito curta');
+                return;
+            }
+            
+            if (password && password !== confirmPassword) {
+                alert('Senhas não coincidem!');
+                logEvent('ERRO: Senhas não coincidem');
+                return;
+            }
+            
+            logEvent('Validação OK - Enviando...');
+            document.getElementById('debugForm').submit();
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            logEvent('Página carregada');
+            checkElementStatus();
+            
+            // Verificar status a cada 2 segundos
+            setInterval(checkElementStatus, 2000);
+            
+            // Adicionar event listeners
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                logEvent('Botão de senha clicado');
+            });
+            
+            document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+                logEvent('Botão de confirmação clicado');
+            });
+            
+            document.getElementById('submitBtn').addEventListener('click', function() {
+                logEvent('Botão de submit clicado');
+            });
+        });
+    </script>
+</body>
+</html> 

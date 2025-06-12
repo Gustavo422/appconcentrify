@@ -22,14 +22,14 @@ router.get('/', requireAuth, async (req, res) => {
 
     res.render('questoes-semanais/index', {
       title: 'Questões Semanais - Concentrify',
-      questoesSemanais: questoesSemanais || []
+      questoesSemanais: questoesSemanais || [],
     });
   } catch (error) {
     console.error('Erro ao listar questões semanais:', error);
     req.flash('error', 'Erro ao carregar questões semanais');
     res.render('questoes-semanais/index', {
       title: 'Questões Semanais - Concentrify',
-      questoesSemanais: []
+      questoesSemanais: [],
     });
   }
 });
@@ -51,7 +51,7 @@ router.get('/admin', requireAdmin, async (req, res) => {
 
     res.render('questoes-semanais/admin', {
       title: 'Gerenciar Questões Semanais - Concentrify',
-      questoesSemanais: questoesSemanais || []
+      questoesSemanais: questoesSemanais || [],
     });
   } catch (error) {
     console.error('Erro ao carregar admin de questões semanais:', error);

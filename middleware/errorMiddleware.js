@@ -12,8 +12,8 @@ const notFound = (req, res, next) => {
 /**
  * Middleware global de tratamento de erros
  */
-const errorHandler = (err, req, res, next) => {
-  let error = { ...err };
+const errorHandler = (err, req, res, _next) => {
+  const error = { ...err };
   error.message = err.message;
 
   // Log do erro
@@ -29,17 +29,17 @@ const errorHandler = (err, req, res, next) => {
   // Erro do Supabase
   if (err.code) {
     switch (err.code) {
-      case '23505': // Violação de unique constraint
-        error.message = 'Este registro já existe';
-        error.status = 400;
-        break;
-      case '23503': // Violação de foreign key
-        error.message = 'Referência inválida';
-        error.status = 400;
-        break;
-      default:
-        error.message = 'Erro interno do servidor';
-        error.status = 500;
+    case '23505': // Violação de unique constraint
+      error.message = 'Este registro já existe';
+      error.status = 400;
+      break;
+    case '23503': // Violação de foreign key
+      error.message = 'Referência inválida';
+      error.status = 400;
+      break;
+    default:
+      error.message = 'Erro interno do servidor';
+      error.status = 500;
     }
   }
 
@@ -53,22 +53,28 @@ const errorHandler = (err, req, res, next) => {
     res.status(status).json({
       success: false,
       error: message,
-      ...(config.NODE_ENV === 'development' && { stack: err.stack })
+      ...(config.NODE_ENV === 'development' && { stack: err.stack }),
     });
   } else {
     // Requisição normal
     req.flash('error', message);
-    
+
     if (status === 404) {
       res.status(404).render('errors/404', {
         title: 'Página não encontrada',
-        message: 'A página que você está procurando não existe.'
+        message: 'A página que você está procurando não existe.',
+        originalUrl: req.originalUrl,
+        layout: 'layouts/error',
       });
     } else {
       res.status(status).render('errors/500', {
         title: 'Erro interno',
-        message: config.NODE_ENV === 'development' ? message : 'Algo deu errado. Tente novamente.',
-        ...(config.NODE_ENV === 'development' && { stack: err.stack })
+        message:
+          config.NODE_ENV === 'development'
+            ? message
+            : 'Algo deu errado. Tente novamente.',
+        layout: 'layouts/error',
+        ...(config.NODE_ENV === 'development' && { stack: err.stack }),
       });
     }
   }
@@ -76,5 +82,5 @@ const errorHandler = (err, req, res, next) => {
 
 module.exports = {
   notFound,
-  errorHandler
+  errorHandler,
 };

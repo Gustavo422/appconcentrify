@@ -1,0 +1,88 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Gerenciar Questões Semanais</h1>
+    <a href="/questoes-semanais/new" 
+       class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      Nova Questão Semanal
+    </a>
+  </div>
+
+  <% if (questoesSemanais && questoesSemanais.length > 0) { %>
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <ul class="divide-y divide-gray-200">
+        <% questoesSemanais.forEach(function(questao) { %>
+          <li>
+            <div class="px-4 py-4 flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span class="text-blue-600 font-semibold">Q</span>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">
+                    Semana <%= questao.semana_referencia %>
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    <%= questao.titulo || 'Sem título' %>
+                  </div>
+                  <div class="text-xs text-gray-400">
+                    Criado em: <%= new Date(questao.created_at).toLocaleDateString('pt-BR') %>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <%= questao.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                  <%= questao.status === 'ativo' ? 'Ativo' : 'Inativo' %>
+                </span>
+                <a href="/questoes-semanais/<%= questao.id %>/edit" 
+                   class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                  Editar
+                </a>
+                <button onclick="deleteQuestao('<%= questao.id %>')" 
+                        class="text-red-600 hover:text-red-900 text-sm font-medium">
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } else { %>
+    <div class="text-center py-12">
+      <div class="text-gray-500 text-lg mb-4">
+        Nenhuma questão semanal encontrada
+      </div>
+      <a href="/questoes-semanais/new" 
+         class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Criar Primeira Questão
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<script>
+function deleteQuestao(id) {
+  if (confirm('Tem certeza que deseja excluir esta questão semanal?')) {
+    fetch(`/questoes-semanais/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert('Erro ao excluir questão semanal');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Erro ao excluir questão semanal');
+    });
+  }
+}
+</script> 

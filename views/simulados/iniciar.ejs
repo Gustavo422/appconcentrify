@@ -1,0 +1,121 @@
+<%- include('../layouts/main') %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header do Simulado -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-8 text-white mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-3xl font-bold"><%= simulado.titulo %></h1>
+        <a href="/simulados" class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 rounded-md hover:bg-opacity-30 transition-colors">
+          <i class="fas fa-arrow-left mr-2"></i>
+          Voltar
+        </a>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="text-2xl font-bold"><%= simulado.total_questoes %></div>
+          <div class="text-sm opacity-90">Questões</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold"><%= simulado.tempo_estimado || 'Não definido' %></div>
+          <div class="text-sm opacity-90">Tempo Estimado</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold"><%= simulado.materias %></div>
+          <div class="text-sm opacity-90">Matérias</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instruções -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Instruções</h2>
+      
+      <div class="space-y-4 text-gray-600">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+            <span class="text-blue-600 text-sm font-bold">1</span>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-1">Leia atentamente cada questão</h3>
+            <p>Certifique-se de entender completamente o enunciado antes de responder.</p>
+          </div>
+        </div>
+        
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+            <span class="text-blue-600 text-sm font-bold">2</span>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-1">Marque apenas uma alternativa</h3>
+            <p>Cada questão possui apenas uma resposta correta.</p>
+          </div>
+        </div>
+        
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+            <span class="text-blue-600 text-sm font-bold">3</span>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-1">Gerencie seu tempo</h3>
+            <p>Distribua o tempo disponível entre todas as questões.</p>
+          </div>
+        </div>
+        
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+            <span class="text-blue-600 text-sm font-bold">4</span>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-1">Revise suas respostas</h3>
+            <p>Use o tempo restante para revisar suas respostas antes de finalizar.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações Importantes -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-lg font-semibold text-yellow-800 mb-2">Informações Importantes</h3>
+          <ul class="text-yellow-700 space-y-1">
+            <li>• Não é possível pausar o simulado após iniciá-lo</li>
+            <li>• Você pode navegar entre as questões livremente</li>
+            <li>• As respostas são salvas automaticamente</li>
+            <li>• Após finalizar, você verá seu resultado imediatamente</li>
+            <li>• Não é possível refazer o simulado após finalizá-lo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botão de Iniciar -->
+    <div class="text-center">
+      <button onclick="iniciarSimulado()" 
+              class="inline-flex items-center px-8 py-4 bg-green-600 text-white text-lg font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-lg">
+        <i class="fas fa-play mr-3"></i>
+        Iniciar Simulado
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function iniciarSimulado() {
+  if (confirm('Tem certeza que deseja iniciar o simulado? Esta ação não pode ser desfeita.')) {
+    // Redirecionar para a primeira questão
+    window.location.href = `/simulados/<%= simulado.id %>/questao/1`;
+  }
+}
+
+// Prevenir saída acidental da página
+window.addEventListener('beforeunload', function(e) {
+  e.preventDefault();
+  e.returnValue = '';
+});
+</script> 

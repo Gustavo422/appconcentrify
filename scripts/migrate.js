@@ -11,7 +11,7 @@ const path = require('path');
 
 const MIGRATIONS_DIR = path.join(__dirname, '..', 'migrations');
 
-async function runMigrations() {
+const runMigrations = async function() {
   console.log('🔄 Executando migrações...');
 
   try {
@@ -26,7 +26,7 @@ async function runMigrations() {
 
     for (const file of sqlFiles) {
       const migrationName = path.basename(file, '.sql');
-      
+
       // Verificar se a migração já foi executada
       const { data: executed } = await supabaseAdmin
         .from('migrations')
@@ -44,21 +44,23 @@ async function runMigrations() {
       const sql = await fs.readFile(migrationPath, 'utf8');
 
       console.log(`🔄 Executando migração: ${migrationName}`);
-      
-      const { error } = await supabaseAdmin.rpc('execute_sql', { sql_query: sql });
-      
+
+      const { error } = await supabaseAdmin.rpc('execute_sql', {
+        sql_query: sql,
+      });
+
       if (error) {
         console.error(`❌ Erro na migração ${migrationName}:`, error);
         continue;
       }
 
       // Registrar migração como executada
-      await supabaseAdmin
-        .from('migrations')
-        .insert([{
+      await supabaseAdmin.from('migrations').insert([
+        {
           name: migrationName,
-          executed_at: new Date().toISOString()
-        }]);
+          executed_at: new Date().toISOString(),
+        },
+      ]);
 
       console.log(`✅ Migração ${migrationName} executada com sucesso`);
     }
@@ -68,7 +70,7 @@ async function runMigrations() {
     console.error('❌ Erro ao executar migrações:', error);
     process.exit(1);
   }
-}
+};
 
 // Executar apenas se chamado diretamente
 if (require.main === module) {
