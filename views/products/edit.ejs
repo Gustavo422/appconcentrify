@@ -1,0 +1,568 @@
+<div class="max-w-4xl mx-auto space-y-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Editar Produto</h1>
+      <p class="mt-2 text-gray-600">Modifique as informações do produto "<%= product.title %>"</p>
+    </div>
+    <div class="flex space-x-3">
+      <a href="/products" class="btn btn-secondary">
+        <i class="fas fa-arrow-left mr-2"></i>
+        Voltar
+      </a>
+      <a href="/products/<%= product.id %>" class="btn btn-secondary">
+        <i class="fas fa-eye mr-2"></i>
+        Visualizar
+      </a>
+    </div>
+  </div>
+
+  <!-- Formulário Principal -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="text-lg font-semibold text-gray-900">
+        <i class="fas fa-edit mr-2 text-primary-600"></i>
+        Editar Informações do Produto
+      </h3>
+    </div>
+    <div class="card-body">
+      <form id="productForm" method="POST" action="/products/<%= product.id %>?_method=PUT" enctype="multipart/form-data" class="space-y-6">
+        
+        <!-- Informações Básicas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2">
+            <label for="title" class="form-label">
+              <i class="fas fa-heading mr-2 text-primary-600"></i>
+              Título do Produto *
+            </label>
+            <input 
+              type="text" 
+              id="title" 
+              name="title" 
+              required
+              value="<%= product.title %>"
+              class="form-input"
+              placeholder="Ex: Método Memória de Elefante"
+            >
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="description" class="form-label">
+              <i class="fas fa-align-left mr-2 text-primary-600"></i>
+              Descrição
+            </label>
+            <textarea 
+              id="description" 
+              name="description" 
+              rows="4"
+              class="form-input"
+              placeholder="Descreva o produto e seus benefícios..."
+            ><%= product.description || '' %></textarea>
+          </div>
+
+          <div>
+            <label for="content_type" class="form-label">
+              <i class="fas fa-tags mr-2 text-primary-600"></i>
+              Tipo de Conteúdo *
+            </label>
+            <select 
+              id="content_type" 
+              name="content_type" 
+              required
+              class="form-input"
+              onchange="handleContentTypeChange()"
+            >
+              <option value="pdf" <%= product.content_type === 'pdf' ? 'selected' : '' %>>PDF</option>
+              <option value="simulados" <%= product.content_type === 'simulados' ? 'selected' : '' %>>Simulados</option>
+              <option value="questoes_semanais" <%= product.content_type === 'questoes_semanais' ? 'selected' : '' %>>Questões Semanais</option>
+              <option value="macetes" <%= product.content_type === 'macetes' ? 'selected' : '' %>>Macetes</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="is_main" class="form-label">
+              <i class="fas fa-star mr-2 text-primary-600"></i>
+              Classificação
+            </label>
+            <select 
+              id="is_main" 
+              name="is_main" 
+              class="form-input"
+            >
+              <option value="true" <%= product.is_main ? 'selected' : '' %>>Produto Principal</option>
+              <option value="false" <%= !product.is_main ? 'selected' : '' %>>Produto Bônus</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="order" class="form-label">
+              <i class="fas fa-sort-numeric-up mr-2 text-primary-600"></i>
+              Ordem de Exibição
+            </label>
+            <input 
+              type="number" 
+              id="order" 
+              name="order" 
+              min="0"
+              value="<%= product.order || 0 %>"
+              class="form-input"
+              placeholder="0"
+            >
+          </div>
+
+          <div>
+            <label for="cover_image" class="form-label">
+              <i class="fas fa-image mr-2 text-primary-600"></i>
+              Imagem de Capa
+            </label>
+            <input 
+              type="url" 
+              id="cover_image" 
+              name="cover_image" 
+              value="<%= product.cover_image || '' %>"
+              class="form-input"
+              placeholder="https://exemplo.com/imagem.jpg"
+            >
+          </div>
+
+          <div>
+            <label for="file_url" class="form-label">
+              <i class="fas fa-link mr-2 text-primary-600"></i>
+              URL do Arquivo
+            </label>
+            <input 
+              type="url" 
+              id="file_url" 
+              name="file_url" 
+              value="<%= product.file_url || '' %>"
+              class="form-input"
+              placeholder="https://exemplo.com/arquivo.pdf"
+            >
+          </div>
+        </div>
+
+        <!-- Preview da Imagem Atual -->
+        <% if (product.cover_image) { %>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="text-sm font-medium text-gray-900 mb-3">Imagem Atual:</h4>
+            <div class="w-32 h-32 bg-gray-200 rounded-lg overflow-hidden">
+              <img 
+                src="<%= product.cover_image %>" 
+                alt="<%= product.title %>" 
+                class="w-full h-full object-cover"
+                onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-full text-gray-400\'><i class=\'fas fa-image text-2xl\'></i></div>'"
+              >
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Upload de Novo Arquivo -->
+        <div id="fileUploadSection" class="space-y-4">
+          <h4 class="text-lg font-semibold text-gray-900">
+            <i class="fas fa-upload mr-2 text-primary-600"></i>
+            Atualizar Arquivo (Opcional)
+          </h4>
+          
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors">
+            <input 
+              type="file" 
+              id="file_upload" 
+              name="file_upload" 
+              class="hidden"
+              accept=".pdf,.json"
+              onchange="handleFileUpload()"
+            >
+            <label for="file_upload" class="cursor-pointer">
+              <div class="text-gray-400 mb-4">
+                <i class="fas fa-cloud-upload-alt text-4xl"></i>
+              </div>
+              <p class="text-lg font-medium text-gray-900 mb-2">
+                Clique para fazer upload de um novo arquivo
+              </p>
+              <p class="text-sm text-gray-600">
+                Formatos aceitos: PDF, JSON (máx. 10MB)
+              </p>
+              <% if (product.file_url) { %>
+                <p class="text-xs text-gray-500 mt-2">
+                  Arquivo atual: <%= product.file_url.split('/').pop() %>
+                </p>
+              <% } %>
+            </label>
+          </div>
+          
+          <div id="uploadProgress" class="hidden">
+            <div class="bg-gray-200 rounded-full h-2">
+              <div id="progressBar" class="bg-primary-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p id="uploadStatus" class="text-sm text-gray-600 mt-2">Preparando upload...</p>
+          </div>
+        </div>
+
+        <!-- Editor JSON (se aplicável) -->
+        <div id="jsonEditorSection" class="<%= ['simulados', 'questoes_semanais', 'macetes'].includes(product.content_type) ? '' : 'hidden' %> space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-lg font-semibold text-gray-900">
+              <i class="fas fa-code mr-2 text-primary-600"></i>
+              Editor JSON
+            </h4>
+            <div class="flex space-x-2">
+              <button type="button" onclick="validateJSON()" class="btn btn-secondary btn-sm">
+                <i class="fas fa-check mr-2"></i>
+                Validar JSON
+              </button>
+              <button type="button" onclick="formatJSON()" class="btn btn-secondary btn-sm">
+                <i class="fas fa-magic mr-2"></i>
+                Formatar
+              </button>
+              <button type="button" onclick="loadFromFile()" class="btn btn-secondary btn-sm">
+                <i class="fas fa-download mr-2"></i>
+                Carregar do Arquivo
+              </button>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <textarea 
+              id="json_content" 
+              name="json_content" 
+              rows="15"
+              class="form-input font-mono text-sm"
+              placeholder="Cole ou digite o conteúdo JSON aqui..."
+            ></textarea>
+            <div id="jsonValidation" class="mt-2 hidden">
+              <div id="jsonValidationMessage" class="text-sm"></div>
+            </div>
+          </div>
+
+          <!-- Templates JSON -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h5 class="font-medium text-gray-900 mb-3">Templates JSON:</h5>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="loadTemplate('simulado')" class="btn btn-secondary btn-sm">
+                Template Simulado
+              </button>
+              <button type="button" onclick="loadTemplate('questoes')" class="btn btn-secondary btn-sm">
+                Template Questões Semanais
+              </button>
+              <button type="button" onclick="loadTemplate('macetes')" class="btn btn-secondary btn-sm">
+                Template Macetes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações do Produto -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-gray-900 mb-3">Informações do Produto:</h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <span class="text-gray-600">Criado em:</span>
+              <p class="font-medium"><%= new Date(product.created_at).toLocaleDateString('pt-BR') %></p>
+            </div>
+            <div>
+              <span class="text-gray-600">Atualizado em:</span>
+              <p class="font-medium"><%= new Date(product.updated_at).toLocaleDateString('pt-BR') %></p>
+            </div>
+            <div>
+              <span class="text-gray-600">ID:</span>
+              <p class="font-mono text-xs"><%= product.id %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+          <div class="flex space-x-3">
+            <a href="/products" class="btn btn-secondary">
+              <i class="fas fa-times mr-2"></i>
+              Cancelar
+            </a>
+            <a href="/products/<%= product.id %>" class="btn btn-secondary">
+              <i class="fas fa-eye mr-2"></i>
+              Visualizar
+            </a>
+          </div>
+          
+          <div class="flex space-x-3">
+            <button type="button" onclick="previewProduct()" class="btn btn-secondary">
+              <i class="fas fa-eye mr-2"></i>
+              Preview
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save mr-2"></i>
+              Salvar Alterações
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Preview do Produto</h3>
+          <button onclick="closePreview()" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <div id="previewContent">
+          <!-- Conteúdo do preview será inserido aqui -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Templates JSON (mesmo do create)
+const jsonTemplates = {
+  simulado: {
+    "titulo": "Simulado de Exemplo",
+    "descricao": "Descrição do simulado",
+    "areas_conhecimento": [
+      {
+        "materia": "Português",
+        "questoes": [
+          {
+            "enunciado": "Qual é a função sintática do termo destacado na frase?",
+            "alternativas": {
+              "A": "Sujeito",
+              "B": "Predicado",
+              "C": "Objeto direto",
+              "D": "Objeto indireto",
+              "E": "Adjunto adverbial"
+            },
+            "correta": "A"
+          }
+        ]
+      }
+    ]
+  },
+  questoes: {
+    "titulo": "Questões Semanais - Semana 1",
+    "descricao": "Questões da primeira semana",
+    "semana_referencia": "2024-01-15",
+    "areas_conhecimento": [
+      {
+        "materia": "Matemática",
+        "questoes": [
+          {
+            "enunciado": "Qual é o resultado de 2 + 2?",
+            "alternativas": {
+              "A": "3",
+              "B": "4",
+              "C": "5",
+              "D": "6",
+              "E": "7"
+            },
+            "correta": "B",
+            "nivel_dificuldade": "básico"
+          }
+        ]
+      }
+    ]
+  },
+  macetes: [
+    {
+      "classe": "Português",
+      "nivel": "Básico",
+      "macete": "Para lembrar dos pronomes pessoais",
+      "abreviacao": "EU-TU-ELE",
+      "explicacao": "Eu, tu, ele são os pronomes pessoais do caso reto"
+    }
+  ]
+};
+
+function handleContentTypeChange() {
+  const contentType = document.getElementById('content_type').value;
+  const jsonSection = document.getElementById('jsonEditorSection');
+  
+  if (['simulados', 'questoes_semanais', 'macetes'].includes(contentType)) {
+    jsonSection.classList.remove('hidden');
+    document.getElementById('file_upload').accept = '.json';
+  } else {
+    jsonSection.classList.add('hidden');
+    document.getElementById('file_upload').accept = '.pdf,.json';
+  }
+}
+
+function loadTemplate(type) {
+  const textarea = document.getElementById('json_content');
+  const template = jsonTemplates[type];
+  textarea.value = JSON.stringify(template, null, 2);
+  formatJSON();
+}
+
+function loadFromFile() {
+  const fileUrl = document.getElementById('file_url').value;
+  if (!fileUrl) {
+    showValidationMessage('Nenhuma URL de arquivo definida', 'error');
+    return;
+  }
+  
+  if (!fileUrl.endsWith('.json')) {
+    showValidationMessage('Arquivo deve ser JSON para carregar no editor', 'error');
+    return;
+  }
+  
+  fetch(fileUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro ao carregar arquivo');
+      }
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById('json_content').value = JSON.stringify(data, null, 2);
+      showValidationMessage('Conteúdo carregado do arquivo com sucesso!', 'success');
+    })
+    .catch(error => {
+      showValidationMessage('Erro ao carregar arquivo: ' + error.message, 'error');
+    });
+}
+
+function formatJSON() {
+  const textarea = document.getElementById('json_content');
+  try {
+    const parsed = JSON.parse(textarea.value);
+    textarea.value = JSON.stringify(parsed, null, 2);
+    showValidationMessage('JSON formatado com sucesso!', 'success');
+  } catch (error) {
+    showValidationMessage('Erro ao formatar JSON: ' + error.message, 'error');
+  }
+}
+
+function validateJSON() {
+  const contentType = document.getElementById('content_type').value;
+  const jsonContent = document.getElementById('json_content').value;
+  
+  if (!jsonContent.trim()) {
+    showValidationMessage('Conteúdo JSON está vazio', 'error');
+    return;
+  }
+  
+  fetch('/products/validate-json', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      content_type: contentType,
+      json_content: jsonContent
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showValidationMessage(data.message, 'success');
+    } else {
+      showValidationMessage(data.error, 'error');
+    }
+  })
+  .catch(error => {
+    showValidationMessage('Erro na validação: ' + error.message, 'error');
+  });
+}
+
+function showValidationMessage(message, type) {
+  const validationDiv = document.getElementById('jsonValidation');
+  const messageDiv = document.getElementById('jsonValidationMessage');
+  
+  validationDiv.classList.remove('hidden');
+  messageDiv.className = `text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+  messageDiv.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
+    ${message}
+  `;
+  
+  setTimeout(() => {
+    validationDiv.classList.add('hidden');
+  }, 5000);
+}
+
+function handleFileUpload() {
+  const fileInput = document.getElementById('file_upload');
+  const file = fileInput.files[0];
+  
+  if (!file) return;
+  
+  const progressDiv = document.getElementById('uploadProgress');
+  const progressBar = document.getElementById('progressBar');
+  const statusText = document.getElementById('uploadStatus');
+  
+  progressDiv.classList.remove('hidden');
+  
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 10;
+    progressBar.style.width = progress + '%';
+    statusText.textContent = `Uploading... ${progress}%`;
+    
+    if (progress >= 100) {
+      clearInterval(interval);
+      statusText.textContent = 'Upload concluído!';
+      
+      if (file.type === 'application/json') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('json_content').value = e.target.result;
+          formatJSON();
+        };
+        reader.readAsText(file);
+      }
+    }
+  }, 200);
+}
+
+function previewProduct() {
+  const formData = new FormData(document.getElementById('productForm'));
+  const data = Object.fromEntries(formData.entries());
+  
+  const previewContent = document.getElementById('previewContent');
+  previewContent.innerHTML = `
+    <div class="space-y-4">
+      <div class="border rounded-lg p-4">
+        <h4 class="font-semibold text-lg">${data.title || 'Título não definido'}</h4>
+        <p class="text-gray-600 mt-2">${data.description || 'Sem descrição'}</p>
+        <div class="flex items-center space-x-2 mt-3">
+          <span class="badge badge-primary">${data.content_type || 'Tipo não definido'}</span>
+          <span class="badge ${data.is_main === 'true' ? 'badge-success' : 'badge-warning'}">
+            ${data.is_main === 'true' ? 'Principal' : 'Bônus'}
+          </span>
+        </div>
+        ${data.cover_image ? `
+          <div class="mt-3">
+            <img src="${data.cover_image}" alt="Preview" class="w-32 h-32 object-cover rounded">
+          </div>
+        ` : ''}
+      </div>
+      ${data.json_content ? `
+        <div class="border rounded-lg p-4">
+          <h5 class="font-medium mb-2">Conteúdo JSON:</h5>
+          <pre class="bg-gray-100 p-3 rounded text-sm overflow-x-auto max-h-64">${data.json_content}</pre>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  
+  document.getElementById('previewModal').classList.remove('hidden');
+}
+
+function closePreview() {
+  document.getElementById('previewModal').classList.add('hidden');
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+  // Carregar conteúdo JSON existente se houver
+  const contentType = '<%= product.content_type %>';
+  const fileUrl = '<%= product.file_url || "" %>';
+  
+  if (['simulados', 'questoes_semanais', 'macetes'].includes(contentType) && fileUrl.endsWith('.json')) {
+    loadFromFile();
+  }
+});
+</script>

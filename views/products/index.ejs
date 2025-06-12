@@ -1,37 +1,149 @@
-<div class="container mx-auto px-4 py-8">
-  <!-- Cabeçalho -->
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">Produtos</h1>
-    <p class="text-gray-600">Acesse todo o conteúdo disponível para seus estudos</p>
+<div class="space-y-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Produtos Educacionais</h1>
+      <p class="mt-2 text-gray-600">Acesse todo o conteúdo disponível para seus estudos</p>
+    </div>
+    <% if (isAdmin) { %>
+      <a href="/products/create" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i>
+        Novo Produto
+      </a>
+    <% } %>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card">
+    <div class="card-body">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-1 min-w-0">
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Buscar produtos..." 
+            class="form-input"
+          >
+        </div>
+        <select id="contentTypeFilter" class="form-input w-auto">
+          <option value="">Todos os tipos</option>
+          <option value="pdf">PDFs</option>
+          <option value="simulados">Simulados</option>
+          <option value="questoes_semanais">Questões Semanais</option>
+          <option value="macetes">Macetes</option>
+        </select>
+        <button id="clearFilters" class="btn btn-secondary">
+          <i class="fas fa-times mr-2"></i>
+          Limpar
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Produtos Principais -->
   <% if (mainProducts && mainProducts.length > 0) { %>
-    <div class="mb-12">
-      <h2 class="text-2xl font-semibold text-gray-900 mb-6">Produtos Principais</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-semibold text-gray-900">
+          <i class="fas fa-star mr-2 text-warning-500"></i>
+          Produtos Principais
+        </h2>
+        <span class="badge badge-primary"><%= mainProducts.length %> produtos</span>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mainProductsGrid">
         <% mainProducts.forEach(product => { %>
-          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div class="p-6">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900"><%= product.title %></h3>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  <%= product.content_type %>
-                </span>
-              </div>
-              
-              <% if (product.description) { %>
-                <p class="text-gray-600 text-sm mb-4"><%= product.description %></p>
+          <div class="card hover-lift product-card" 
+               data-content-type="<%= product.content_type %>"
+               data-title="<%= product.title.toLowerCase() %>"
+               data-description="<%= (product.description || '').toLowerCase() %>">
+            
+            <!-- Product Image -->
+            <div class="h-48 bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center relative overflow-hidden">
+              <% if (product.cover_image) { %>
+                <img 
+                  src="<%= product.cover_image %>" 
+                  alt="<%= product.title %>" 
+                  class="w-full h-full object-cover"
+                >
+              <% } else { %>
+                <div class="text-center">
+                  <% 
+                    const icons = {
+                      'pdf': 'fas fa-file-pdf text-red-500',
+                      'simulados': 'fas fa-clipboard-list text-blue-500',
+                      'questoes_semanais': 'fas fa-calendar-week text-green-500',
+                      'macetes': 'fas fa-lightbulb text-yellow-500'
+                    };
+                    const icon = icons[product.content_type] || 'fas fa-file text-gray-500';
+                  %>
+                  <i class="<%= icon %> text-4xl mb-2"></i>
+                  <p class="text-sm text-gray-600 capitalize"><%= product.content_type.replace('_', ' ') %></p>
+                </div>
               <% } %>
               
-              <div class="flex items-center justify-between">
+              <!-- Content Type Badge -->
+              <div class="absolute top-3 right-3">
+                <span class="badge badge-primary text-xs">
+                  <%= product.content_type.replace('_', ' ').toUpperCase() %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Product Content -->
+            <div class="card-body">
+              <div class="flex items-start justify-between mb-3">
+                <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
+                  <%= product.title %>
+                </h3>
+                <span class="badge badge-success ml-2 flex-shrink-0">Principal</span>
+              </div>
+
+              <% if (product.description) { %>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                  <%= product.description %>
+                </p>
+              <% } %>
+
+              <!-- Product Stats -->
+              <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+                <span>
+                  <i class="fas fa-calendar mr-1"></i>
+                  <%= new Date(product.created_at).toLocaleDateString('pt-BR') %>
+                </span>
+                <span>
+                  <i class="fas fa-sort-numeric-up mr-1"></i>
+                  Ordem: <%= product.order %>
+                </span>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex space-x-2">
                 <a 
                   href="/products/<%= product.id %>" 
-                  class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  class="btn btn-primary flex-1 text-center"
                 >
                   <i class="fas fa-eye mr-2"></i>
                   Acessar
                 </a>
+                
+                <% if (isAdmin) { %>
+                  <a 
+                    href="/products/<%= product.id %>/edit" 
+                    class="btn btn-secondary"
+                    title="Editar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  
+                  <button 
+                    onclick="deleteProduct('<%= product.id %>')" 
+                    class="btn btn-danger"
+                    title="Excluir"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                <% } %>
               </div>
             </div>
           </div>
@@ -42,35 +154,116 @@
 
   <!-- Produtos Bônus -->
   <% if (bonusProducts && bonusProducts.length > 0) { %>
-    <div class="mb-12">
-      <h2 class="text-2xl font-semibold text-gray-900 mb-6">Produtos Bônus</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-semibold text-gray-900">
+          <i class="fas fa-gift mr-2 text-success-500"></i>
+          Produtos Bônus
+        </h2>
+        <span class="badge badge-success"><%= bonusProducts.length %> produtos</span>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="bonusProductsGrid">
         <% bonusProducts.forEach(product => { %>
-          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div class="p-6">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900"><%= product.title %></h3>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Bônus
+          <div class="card hover-lift product-card" 
+               data-content-type="<%= product.content_type %>"
+               data-title="<%= product.title.toLowerCase() %>"
+               data-description="<%= (product.description || '').toLowerCase() %>">
+            
+            <!-- Product Image -->
+            <div class="h-48 bg-gradient-to-br from-success-100 to-warning-100 flex items-center justify-center relative overflow-hidden">
+              <% if (product.cover_image) { %>
+                <img 
+                  src="<%= product.cover_image %>" 
+                  alt="<%= product.title %>" 
+                  class="w-full h-full object-cover"
+                >
+              <% } else { %>
+                <div class="text-center">
+                  <% 
+                    const icons = {
+                      'pdf': 'fas fa-file-pdf text-red-500',
+                      'simulados': 'fas fa-clipboard-list text-blue-500',
+                      'questoes_semanais': 'fas fa-calendar-week text-green-500',
+                      'macetes': 'fas fa-lightbulb text-yellow-500'
+                    };
+                    const icon = icons[product.content_type] || 'fas fa-file text-gray-500';
+                  %>
+                  <i class="<%= icon %> text-4xl mb-2"></i>
+                  <p class="text-sm text-gray-600 capitalize"><%= product.content_type.replace('_', ' ') %></p>
+                </div>
+              <% } %>
+              
+              <!-- Content Type Badge -->
+              <div class="absolute top-3 right-3">
+                <span class="badge badge-success text-xs">
+                  <%= product.content_type.replace('_', ' ').toUpperCase() %>
                 </span>
               </div>
               
+              <!-- Bonus Badge -->
+              <div class="absolute top-3 left-3">
+                <span class="badge badge-warning text-xs">
+                  <i class="fas fa-gift mr-1"></i>
+                  BÔNUS
+                </span>
+              </div>
+            </div>
+
+            <!-- Product Content -->
+            <div class="card-body">
+              <div class="flex items-start justify-between mb-3">
+                <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
+                  <%= product.title %>
+                </h3>
+                <span class="badge badge-warning ml-2 flex-shrink-0">Bônus</span>
+              </div>
+
               <% if (product.description) { %>
-                <p class="text-gray-600 text-sm mb-4"><%= product.description %></p>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                  <%= product.description %>
+                </p>
               <% } %>
-              
-              <div class="flex items-center justify-between">
+
+              <!-- Product Stats -->
+              <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+                <span>
+                  <i class="fas fa-calendar mr-1"></i>
+                  <%= new Date(product.created_at).toLocaleDateString('pt-BR') %>
+                </span>
+                <span class="text-success-600 font-medium">
+                  <i class="fas fa-gift mr-1"></i>
+                  Grátis
+                </span>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex space-x-2">
                 <a 
                   href="/products/<%= product.id %>" 
-                  class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                  class="btn btn-success flex-1 text-center"
                 >
                   <i class="fas fa-gift mr-2"></i>
                   Acessar Bônus
                 </a>
                 
-                <span class="text-sm text-green-600 font-medium">
-                  Grátis
-                </span>
+                <% if (isAdmin) { %>
+                  <a 
+                    href="/products/<%= product.id %>/edit" 
+                    class="btn btn-secondary"
+                    title="Editar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  
+                  <button 
+                    onclick="deleteProduct('<%= product.id %>')" 
+                    class="btn btn-danger"
+                    title="Excluir"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                <% } %>
               </div>
             </div>
           </div>
@@ -79,14 +272,155 @@
     </div>
   <% } %>
 
-  <!-- Estado vazio -->
+  <!-- Estado Vazio -->
   <% if ((!mainProducts || mainProducts.length === 0) && (!bonusProducts || bonusProducts.length === 0)) { %>
-    <div class="text-center py-12">
-      <div class="text-gray-400 mb-4">
-        <i class="fas fa-box text-6xl"></i>
+    <div class="text-center py-16">
+      <div class="text-gray-400 mb-6">
+        <i class="fas fa-box-open text-8xl"></i>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum produto disponível</h3>
-      <p class="text-gray-500">Não há produtos cadastrados no momento.</p>
+      <h3 class="text-2xl font-semibold text-gray-900 mb-4">Nenhum produto disponível</h3>
+      <p class="text-gray-600 mb-8 max-w-md mx-auto">
+        Não há produtos cadastrados no momento. 
+        <% if (isAdmin) { %>
+          Comece criando o primeiro produto.
+        <% } else { %>
+          Volte em breve para novos conteúdos!
+        <% } %>
+      </p>
+      <% if (isAdmin) { %>
+        <a href="/products/create" class="btn btn-primary">
+          <i class="fas fa-plus mr-2"></i>
+          Criar Primeiro Produto
+        </a>
+      <% } %>
     </div>
   <% } %>
-</div> 
+</div>
+
+<script>
+// Filtros e busca
+const searchInput = document.getElementById('searchInput');
+const contentTypeFilter = document.getElementById('contentTypeFilter');
+const clearFiltersBtn = document.getElementById('clearFilters');
+const productCards = document.querySelectorAll('.product-card');
+
+function filterProducts() {
+  const searchTerm = searchInput.value.toLowerCase();
+  const contentType = contentTypeFilter.value;
+  
+  productCards.forEach(card => {
+    const title = card.dataset.title;
+    const description = card.dataset.description;
+    const cardContentType = card.dataset.contentType;
+    
+    const matchesSearch = !searchTerm || 
+      title.includes(searchTerm) || 
+      description.includes(searchTerm);
+    
+    const matchesType = !contentType || cardContentType === contentType;
+    
+    if (matchesSearch && matchesType) {
+      card.style.display = 'block';
+      card.classList.add('fade-in');
+    } else {
+      card.style.display = 'none';
+      card.classList.remove('fade-in');
+    }
+  });
+  
+  // Atualizar contadores
+  updateProductCounts();
+}
+
+function updateProductCounts() {
+  const visibleMainProducts = document.querySelectorAll('#mainProductsGrid .product-card[style="display: block"], #mainProductsGrid .product-card:not([style*="display: none"])').length;
+  const visibleBonusProducts = document.querySelectorAll('#bonusProductsGrid .product-card[style="display: block"], #bonusProductsGrid .product-card:not([style*="display: none"])').length;
+  
+  // Atualizar badges de contagem se existirem
+  const mainBadge = document.querySelector('h2:has(i.fa-star) + .badge');
+  const bonusBadge = document.querySelector('h2:has(i.fa-gift) + .badge');
+  
+  if (mainBadge) mainBadge.textContent = `${visibleMainProducts} produtos`;
+  if (bonusBadge) bonusBadge.textContent = `${visibleBonusProducts} produtos`;
+}
+
+function clearFilters() {
+  searchInput.value = '';
+  contentTypeFilter.value = '';
+  filterProducts();
+}
+
+// Event listeners
+searchInput.addEventListener('input', filterProducts);
+contentTypeFilter.addEventListener('change', filterProducts);
+clearFiltersBtn.addEventListener('click', clearFilters);
+
+// Função para excluir produto (apenas admin)
+<% if (isAdmin) { %>
+function deleteProduct(productId) {
+  if (confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) {
+    fetch(`/products/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Remover o card da interface
+        const productCard = document.querySelector(`[onclick="deleteProduct('${productId}')"]`).closest('.product-card');
+        productCard.style.transition = 'opacity 0.3s ease-out';
+        productCard.style.opacity = '0';
+        setTimeout(() => {
+          productCard.remove();
+          updateProductCounts();
+        }, 300);
+        
+        // Mostrar mensagem de sucesso
+        showNotification('Produto excluído com sucesso!', 'success');
+      } else {
+        showNotification('Erro ao excluir produto: ' + data.error, 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      showNotification('Erro ao excluir produto', 'error');
+    });
+  }
+}
+
+function showNotification(message, type) {
+  // Criar notificação temporária
+  const notification = document.createElement('div');
+  notification.className = `alert alert-${type} fixed top-4 right-4 z-50 fade-in`;
+  notification.innerHTML = `
+    <div class="flex items-center">
+      <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
+      <span>${message}</span>
+      <button onclick="this.parentElement.parentElement.remove()" class="ml-4">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto remover após 5 segundos
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 5000);
+}
+<% } %>
+
+// Animações de entrada
+document.addEventListener('DOMContentLoaded', function() {
+  // Adicionar animação de entrada aos cards
+  productCards.forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.1}s`;
+    card.classList.add('slide-up');
+  });
+});
+</script>
